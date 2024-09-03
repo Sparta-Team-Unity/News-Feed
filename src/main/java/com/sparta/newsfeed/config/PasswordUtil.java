@@ -1,5 +1,4 @@
 package com.sparta.newsfeed.config;
 
-public class FilterConfig {
-
+public class PasswordUtil {
 }
