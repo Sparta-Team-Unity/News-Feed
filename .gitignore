@@ -68,6 +68,7 @@ local.properties
 ### Eclipse Patch ###
 # Spring Boot Tooling
 .sts4-cache/
+src/main/resources/application.properties
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
