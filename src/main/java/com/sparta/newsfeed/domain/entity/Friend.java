@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "friends")    // 이부분 진현이랑 맞춰봐야 할듯
+@Table(name = "friends")
 public class Friend extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +25,7 @@ public class Friend extends Timestamped{
     private User fromUser;
     private boolean isAccepted;
     private LocalDateTime requestAt;
+
 
     public Friend( User toUser, User fromUser) {
         this.toUser = toUser;
