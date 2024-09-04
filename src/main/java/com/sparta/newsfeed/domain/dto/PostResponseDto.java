@@ -1,6 +1,7 @@
 package com.sparta.newsfeed.domain.dto;
 
 import com.sparta.newsfeed.domain.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class PostResponseDto {
 
 
 
+    @Builder
     public PostResponseDto(
             Integer id,
             String title,

@@ -12,9 +12,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/follows")
 public class FriendController {
-//    private final FriendService friendService;
+    private final FriendService friendService;
 
-    @PostMapping("{/followid}")
+    @PostMapping("/{followid}")
     public ResponseEntity<Void> addFriend(@PathVariable("followid") Integer followid) {
 //        friendService.addFriend(followid);
         return ResponseEntity.ok().build();
