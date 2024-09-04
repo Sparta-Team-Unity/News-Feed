@@ -67,6 +67,8 @@ local.properties
 # Spring Boot Tooling
 .sts4-cache/
 
+src/main/resources/application-local.yaml
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
