@@ -9,6 +9,9 @@ class NewsFeedApplicationTests {
 
     @Test
     void contextLoads() {
+        PasswordUtil passwordUtil = new PasswordUtil();
+
+        System.out.println(passwordUtil.isValidPassword("rlarjsdn1@"));
     }
 
 }
