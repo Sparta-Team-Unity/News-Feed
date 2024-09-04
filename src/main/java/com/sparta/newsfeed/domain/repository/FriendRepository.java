@@ -9,5 +9,5 @@ import java.util.Optional;
 
 
 public interface FriendRepository extends JpaRepository<Friend, Integer> {
-    boolean existsByToUserIdAndFromUserId(Integer toUserId, Integer fromUserId);
+    boolean existsByToUserAndFromUser(User toUser, User fromUser);
 }
