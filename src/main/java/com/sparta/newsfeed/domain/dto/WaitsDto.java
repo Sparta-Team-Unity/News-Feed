@@ -1,11 +1,10 @@
 package com.sparta.newsfeed.domain.dto;
 
+import java.time.LocalDateTime;
 
-public class FollowDto {
+public class WaitsDto {
     private int userId;
-
-    public FollowDto(int userId) {
-
+    public WaitsDto(int userId) {
         this.userId = userId;
     }
 }

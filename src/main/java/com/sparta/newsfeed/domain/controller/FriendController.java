@@ -26,5 +26,11 @@ public class FriendController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/waits")
+    public ResponseEntity<FriendResponseDto> friendsInquiryWait(){
+        FriendResponseDto response = friendService.waitsInquiry();
+        return ResponseEntity.ok(response);
+    }
+
 
 }
