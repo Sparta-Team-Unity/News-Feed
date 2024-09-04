@@ -33,8 +33,8 @@ public class PostController {
 
 
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable("postId") Integer id, @RequestBody PostUpdateRequestDto postUpdateRequestDto){
-
+    public ResponseEntity<Void> updatePost(@PathVariable("postId") Integer postId, @RequestBody PostUpdateRequestDto postUpdateRequestDto){
+        postService.updatePost(postId, postUpdateRequestDto);
         return ResponseEntity.ok().build();
     }
 

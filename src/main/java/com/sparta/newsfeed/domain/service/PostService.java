@@ -2,6 +2,7 @@ package com.sparta.newsfeed.domain.service;
 
 import com.sparta.newsfeed.domain.dto.PostRequestDto;
 import com.sparta.newsfeed.domain.dto.PostResponseDto;
+import com.sparta.newsfeed.domain.dto.PostUpdateRequestDto;
 import com.sparta.newsfeed.domain.entity.Post;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.repository.PostRepository;
@@ -35,5 +36,8 @@ public class PostService {
 
     public Page<PostResponseDto> getAllPosts(int page, int size) {
         return null;
+    }
+
+    public void updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto) {
     }
 }
