@@ -1,9 +1,11 @@
 package com.sparta.newsfeed.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class User extends Timestamped {
     @Id
@@ -23,13 +25,5 @@ public class User extends Timestamped {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public int getUserId() {
-        return userId;
     }
 }
