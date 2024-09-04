@@ -3,6 +3,7 @@ package com.sparta.newsfeed.domain.service;
 import com.sparta.newsfeed.domain.dto.FollowDto;
 import com.sparta.newsfeed.domain.dto.FriendResponseDto;
 import com.sparta.newsfeed.domain.dto.WaitsDto;
+import com.sparta.newsfeed.domain.dto.WaitsResponseDto;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.exception.DuplicateFriendException;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
@@ -57,7 +58,7 @@ public class FriendService {
         return new FriendResponseDto(responseList);
     }
 
-    public FriendResponseDto waitsInquiry() {
+    public WaitsResponseDto waitsInquiry() {
 
         // fromUser 추후에 JWT 에서 추출할 것
         // user -> 로그인 중인 현재 사용자
@@ -70,8 +71,9 @@ public class FriendService {
 
         for (Friend wait : wiatList) {
             int waitsId = wait.getFromUser().getUserId();
-            responseList.add(new WaitsDto(waitsId));
+            LocalDateTime time = LocalDateTime.parse(wait.getCreateAt());
+            responseList.add(new WaitsDto(waitsId,time));
         }
-        return new FriendResponseDto(responseList, LocalDateTime.now());
+        return new WaitsResponseDto(responseList);
     }
 }

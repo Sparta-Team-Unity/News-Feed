@@ -1,6 +1,7 @@
 package com.sparta.newsfeed.domain.controller;
 
 import com.sparta.newsfeed.domain.dto.FriendResponseDto;
+import com.sparta.newsfeed.domain.dto.WaitsResponseDto;
 import com.sparta.newsfeed.domain.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,8 @@ public class FriendController {
     }
 
     @GetMapping("/waits")
-    public ResponseEntity<FriendResponseDto> friendsInquiryWait(){
-        FriendResponseDto response = friendService.waitsInquiry();
+    public ResponseEntity<WaitsResponseDto> friendsInquiryWait(){
+        WaitsResponseDto response = friendService.waitsInquiry();
         return ResponseEntity.ok(response);
     }
 
