@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -62,16 +65,12 @@ public class JwtUtil {
      * @param token 추가할 Cookie에 담길 token
      */
     public void addJwtToCookie(HttpServletResponse response, String token) {
-        try {
-            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+        token = URLEncoder.encode(token, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-            cookie.setPath("/");
+        Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+        cookie.setPath("/");
 
-            response.addCookie(cookie);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        response.addCookie(cookie);
     }
 
     /**
@@ -125,5 +124,24 @@ public class JwtUtil {
         String userId = claims.getSubject();
 
         return Integer.parseInt(userId);
+    }
+
+    /**
+     * 요청에서 Token값을 가져오는 메서드
+     * @param request 요청 Servlet
+     * @return Token값 / null : Token이 존재하지 않음
+     */
+    public String getTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                }
+            }
+        }
+
+        return null;
     }
 }
