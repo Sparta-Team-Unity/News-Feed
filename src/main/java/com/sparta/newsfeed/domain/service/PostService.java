@@ -66,4 +66,20 @@ public class PostService {
 
 
     }
+
+    @Transactional
+    public void deletePost(Integer postId) {
+        // 해당 post가 존재하는지 확인
+        Post post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("Post not found"));
+
+        // user 확인 어떻게 하지??
+        // 해당 user 존재하는지 확인
+//        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(()-> new NoSuchElementException("User not found"));
+//
+//        if(post.getUser() == null || !ObjectUtils.nullSafeEquals(user.getUserId(), post.getUser().getUserId())) {
+//            throw new NoSuchElementException("작성자가 일치하지 않습니다.");
+//        }
+
+        postRepository.delete(post);
+    }
 }
