@@ -25,11 +25,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public PostResponseDto createPost(PostRequestDto postRequestDto) {
         // 해당 유저가 존재하는지 확인 (필요한지는 모르겠어요... 로그인 상태이면 필요 x)
         User user = userRepository.findById(postRequestDto.getUserId()).orElseThrow(()-> new NoSuchElementException("User not found"));
 
-        Post newPost = new Post(postRequestDto.getTitle(), postRequestDto.getContents(),user);
+        Post newPost = new Post(postRequestDto.getTitle(), postRequestDto.getContents(), user);
         Post savedPost = postRepository.save(newPost);
 
         return new PostResponseDto(
@@ -38,7 +39,7 @@ public class PostService {
                 savedPost.getContents(),
                 savedPost.getCreateAt(),
                 savedPost.getEditAt(),
-                user
+                savedPost.getUser()
         );
     }
 
@@ -55,7 +56,7 @@ public class PostService {
         // 해당 user 존재하는지 확인
         User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(()-> new NoSuchElementException("User not found"));
 
-        if(post.getUser() == null || !ObjectUtils.nullSafeEquals(user.getUserId(), post.getUser().getUserId())) {
+        if(post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
             throw new NoSuchElementException("작성자가 일치하지 않습니다.");
         }
 
@@ -63,7 +64,6 @@ public class PostService {
                 postUpdateRequestDto.getTitle(),
                 postUpdateRequestDto.getContents()
         );
-
 
     }
 

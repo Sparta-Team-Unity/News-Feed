@@ -1,18 +1,17 @@
 package com.sparta.newsfeed.domain.entity;
 
 import com.sparta.newsfeed.config.DateUtil;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class Timestamped {
 
     @CreatedDate
@@ -23,20 +22,4 @@ public class Timestamped {
     @Column(name = "edit_at", nullable = false, length = 20)
     protected LocalDateTime editAt;
 
-    /**
-     *  데이터 삽입 전 진행되는 함수
-     */
-    @PrePersist
-    public void prePersist() {
-        this.createAt = LocalDateTime.parse(DateUtil.localDateTimeToString(LocalDateTime.now(DateUtil.getTimeZone())));
-        this.editAt = this.createAt;
-    }
-
-    /**
-     * 데이터 갱신 전 진행되는 함수
-     */
-    @PreUpdate
-    public void preUpdate() {
-        this.editAt = LocalDateTime.parse(DateUtil.localDateTimeToString(LocalDateTime.now(DateUtil.getTimeZone())));
-    }
 }
