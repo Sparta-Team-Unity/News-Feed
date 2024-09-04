@@ -14,9 +14,9 @@ import java.util.List;
 public class FriendController {
     private final FriendService friendService;
 
-    @PostMapping("{/followid}")
+    @PostMapping("/{followid}")
     public ResponseEntity<Void> addFriend(@PathVariable("followid") Integer followid) {
-        friendService.addFriend(followid);
+//        friendService.addFriend(followid);
         return ResponseEntity.ok().build();
     }
 

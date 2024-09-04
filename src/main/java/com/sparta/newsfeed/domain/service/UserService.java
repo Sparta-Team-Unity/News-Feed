@@ -34,13 +34,13 @@ public class UserService {
     public void signUp(UserRequestDto userRequestDto) {
         // 비밀번호 조건 확인
         if (!passwordUtil.isValidPassword(userRequestDto.getPassword())) {
-            return ;
+            throw new RuntimeException("회원가입 오류 뭐가 문제?");
         }
 
         // 이메일 중복 확인
         Optional<User> user = userRepository.findByEmail(userRequestDto.getEmail());
         if (!user.isEmpty()) {
-            return;
+            throw new RuntimeException("회원가입 email 문제?");
         }
 
         // 비밀번호 암호화 후 저장
