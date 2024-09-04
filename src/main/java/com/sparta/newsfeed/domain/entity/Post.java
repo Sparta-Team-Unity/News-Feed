@@ -15,20 +15,20 @@ public class Post extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "title", nullable = false, length = 30)
     private String title;
     @Column(name = "content", nullable = false, length = 100)
-    private String content;
+    private String contents;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Post(String title, String content, User user) {
+    public Post(String title, String contents, User user) {
         this.title = title;
-        this.content = content;
+        this.contents = contents;
         this.user = user;
     }
 
