@@ -21,8 +21,8 @@ public class FriendService {
 
         // fromUser 추후에 JWT 에서 추출할 것
         User fromUser = new User();
-        if(friendRepository.existsByToUserIdAndFromUserId(toUser.getUserId(), 1)
-                || friendRepository.existsByToUserIdAndFromUserId(1, toUser.getUserId())){
+        if(friendRepository.existsByToUserAndFromUser(toUser, fromUser)
+                || friendRepository.existsByToUserAndFromUser(fromUser, toUser)){
             throw new DuplicateFriendException();
         }
         friendRepository.save(new Friend(toUser, fromUser));
