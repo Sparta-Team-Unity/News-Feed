@@ -38,7 +38,7 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/posts/{postId}"){
-
-    }
+//    @DeleteMapping("/posts/{postId}"){
+//
+//    }
 }
