@@ -1,6 +1,9 @@
 package com.sparta.newsfeed.domain.controller;
 
 import com.sparta.newsfeed.config.JwtUtil;
+import com.sparta.newsfeed.domain.dto.UserRequestDto;
+import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +13,21 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
-    public UserController(JwtUtil jwtUtil) {
+    public UserController(JwtUtil jwtUtil, UserService userService) {
+        this.userService = userService;
         this.jwtUtil = jwtUtil;
+    }
+
+    @PostMapping("/users")
+    public void signUp(@RequestBody UserRequestDto userRequestDto) {
+        userService.signUp(userRequestDto);
+    }
+
+    @GetMapping("/users/login")
+    public String logIn(@RequestBody UserRequestDto userRequestDto) {
+        return userService.login(userRequestDto);
     }
 
     @GetMapping("/create-jwt/{userId}")
