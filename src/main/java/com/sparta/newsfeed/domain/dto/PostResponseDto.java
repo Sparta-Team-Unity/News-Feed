@@ -14,7 +14,7 @@ public class PostResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime editAt;
-    private Integer user; //user 받아와야 함
+    private String userName; //user 받아와야 함
 
 
 
@@ -32,7 +32,7 @@ public class PostResponseDto {
         this.contents = contents;
         this.createdAt = createAt;
         this.editAt = editAt;
-        this.user = user.getUserId();
+        this.userName = user.getName();
 
     }
 }
