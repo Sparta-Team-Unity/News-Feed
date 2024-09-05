@@ -3,8 +3,14 @@ package com.sparta.newsfeed.domain.service;
 import com.sparta.newsfeed.config.JwtUtil;
 import com.sparta.newsfeed.config.PasswordEncoder;
 import com.sparta.newsfeed.config.PasswordUtil;
-import com.sparta.newsfeed.domain.dto.UserRequestDto;
+import com.sparta.newsfeed.domain.dto.UserDto;
+import com.sparta.newsfeed.domain.dto.UserLoginRequestDto;
+import com.sparta.newsfeed.domain.dto.UserSignUpRequestDto;
+import com.sparta.newsfeed.domain.entity.BlacklistToken;
+import com.sparta.newsfeed.domain.entity.Token;
 import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,71 +19,99 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.sparta.newsfeed.domain.exception.ErrorCode.*;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordUtil passwordUtil;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
     private final JwtUtil jwtUtil;
+    private final BlacklistTokenService blacklistTokenService;
 
-    public UserService(UserRepository userRepository, PasswordUtil passwordUtil, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserService(UserRepository userRepository,
+                       PasswordUtil passwordUtil,
+                       PasswordEncoder passwordEncoder,
+                       TokenService tokenService,
+                       JwtUtil jwtUtil,
+                       BlacklistTokenService blacklistTokenService
+    ) {
         this.userRepository  = userRepository;
         this.passwordUtil = passwordUtil;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.tokenService = tokenService;
+        this.blacklistTokenService = blacklistTokenService;
     }
 
     /**
      * 회원가입 메서드
-     * @param userRequestDto 유저의 입력 정보
+     * @param userSignUnRequestDto 유저의 입력 정보
      */
     @Transactional
-    public void signUp(UserRequestDto userRequestDto) {
+    public void signUp(UserSignUpRequestDto userSignUnRequestDto) {
         // 비밀번호 조건 확인
-        if (!passwordUtil.isValidPassword(userRequestDto.getPassword())) {
-            throw new RuntimeException("회원가입 오류 뭐가 문제?");
+        if (!passwordUtil.isValidPassword(userSignUnRequestDto.getPassword())) {
+            throw new UnityException(INVALID_PASSWORD_FORM);
         }
 
         // 이메일 중복 확인
-        Optional<User> user = userRepository.findByEmail(userRequestDto.getEmail());
-        if (!user.isEmpty()) {
-            throw new RuntimeException("회원가입 email 문제?");
+        Optional<User> user = userRepository.findByEmail(userSignUnRequestDto.getEmail());
+        if (user.isPresent()) {
+            throw new UnityException(CONFLICT_EMAIL);
         }
 
         // 비밀번호 암호화 후 저장
-        String bcryptPassword = passwordEncoder.encode(userRequestDto.getPassword());
-        User newUser = new User(userRequestDto.getEmail(), bcryptPassword, userRequestDto.getName());
+        String bcryptPassword = passwordEncoder.encode(userSignUnRequestDto.getPassword());
+        User newUser = new User(userSignUnRequestDto.getEmail(), bcryptPassword, userSignUnRequestDto.getName(), null);
 
         userRepository.save(newUser);
     }
 
     /**
      * 로그인 후 토큰을 반환하는 메서드
-     * @param userRequestDto 유저 입력값
+     * @param userLoginRequestDto 유저 로그인 입력값
      * @return 해당 유저의 Jwt토큰
      */
-    @Transactional(readOnly = true)
-    public String login(UserRequestDto userRequestDto, HttpServletResponse response) {
+    @Transactional
+    public String login(UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
         // 유저 검증
-        User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow();
 
-        // 비밀번호 검증
-        if (!passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) {
-            return null;
+        if (!user.isActivate()) {
+            throw new UnityException(USER_NOT_EXIST);
         }
 
-        String token = jwtUtil.createToken(user.getUserId());
-        jwtUtil.addJwtToCookie(response, token);
-        return jwtUtil.createToken(user.getUserId());
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
+            throw new UnityException(WRONG_PASSWORD);
+        }
+
+        // 유저가 로그인 했으므로 토큰 갱신
+        Token token = tokenService.createToken(user);
+        jwtUtil.addJwtToCookie(response, token.getAccessToken());
+        user.giveToken(token);
+
+        return token.getAccessToken();
     }
 
     /**
-     * 로그아웃 처리하는 함수 : cookie에 담겨져 있는 토큰을 제거
-     * @param request Jwt토큰을 삭제할 Request객체
-     * @param response 토큰이 갱신될 Response객체
+     * 유저를 로그아웃 처리하는 메서드
+     * @param userDto 유저 정보
      */
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        jwtUtil.deleteJwtInCookie(request, response);
+    @Transactional
+    public void logout(UserDto userDto) throws Exception {
+        User user = userRepository.findById(userDto.getId()).orElseThrow();
+
+        // 토큰을 Blacklist에 삽입
+        blacklistTokenService.addBlacklistToken(user.getToken().getAccessToken());
+    }
+
+    @Transactional
+    public void signOut(UserDto userDto) {
+        User user = userRepository.findById(userDto.getId()).orElseThrow();
+        user.signOut();
     }
 }

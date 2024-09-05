@@ -22,7 +22,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     /**
-     *
+     * Argument에 들어갈 데이터를 조립해주는 메서드
      * @param parameter
      * @param mavContainer
      * @param webRequest

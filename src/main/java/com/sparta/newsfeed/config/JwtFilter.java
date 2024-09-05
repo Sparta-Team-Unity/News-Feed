@@ -1,10 +1,17 @@
 package com.sparta.newsfeed.config;
 
 import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
+import com.sparta.newsfeed.domain.repository.TokenRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
+import com.sparta.newsfeed.domain.service.BlacklistTokenService;
+import com.sparta.newsfeed.domain.service.TokenService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -17,17 +24,19 @@ import java.io.IOException;
 
 @EnableWebSecurity(debug = true)
 @Slf4j(topic = "JwtFilter")
-@Component
 @Order(1)
 public class JwtFilter implements Filter {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
+    private final BlacklistTokenService blacklistTokenService;
 
-
-    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository, TokenService tokenService, BlacklistTokenService blacklistTokenService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
+        this.blacklistTokenService = blacklistTokenService;
     }
 
     /**
@@ -43,29 +52,75 @@ public class JwtFilter implements Filter {
         log.info("doFilter");
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
 
-        System.out.println("Do Filter");
         // 토큰이 필요 없는 URL인지 확인 ( 회원가입, 로그인 )
         if (!isNeedTokenURL(httpServletRequest)) {
             filterChain.doFilter(httpServletRequest, servletResponse);
         } else {
-            String tokenValue = jwtUtil.getTokenFromRequest(httpServletRequest);
+            tokenFilter(httpServletRequest, servletResponse, filterChain);
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
+    }
 
-            if (StringUtils.hasText(tokenValue)) {
-                String token = jwtUtil.substringToken(tokenValue);
+    /**
+     * 토큰 필터 메인 로직
+     * @param servletRequest
+     * @param servletResponse
+     * @param filterChain
+     */
+    private void tokenFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        String tokenValue = jwtUtil.getTokenFromRequest((HttpServletRequest) servletRequest);
 
-                if (!jwtUtil.validateToken(token)) {
-                    throw new IllegalArgumentException("Token invalid");
-                }
+        if (isBlacklistToken(tokenValue)) {
+            throw new UnityException(ErrorCode.INVALID_TOKEN);
+        }
 
-                User user = userRepository.findById(jwtUtil.getUserIdFromToken(token)).orElseThrow(
-                        () -> new NullPointerException("Not Found User")
-                );
-
-                servletRequest.setAttribute("user", user);
-                filterChain.doFilter(servletRequest, servletResponse);
-            } else {
-                throw new IllegalArgumentException("Token Not Found");
+        // token에 값이 존재하는지 확인
+        if (StringUtils.hasText(tokenValue)) {
+            // token 내용 추출
+            String token = jwtUtil.substringToken(tokenValue);
+            // 해당 토큰 관련된 유저가 있는지 확인
+            int userId = getUserIdFromTokenValue(tokenValue);
+            if(userId == -1) {
+                throw new UnityException(ErrorCode.EXPIRED_TOKEN);
             }
+
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new NullPointerException("Not Found User")
+            );
+
+            refreshAccessToken((HttpServletResponse) servletResponse, user);
+            try {
+                servletRequest.setAttribute("user", user);
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            throw new IllegalArgumentException("Token Not Found");
+        }
+    }
+
+    private boolean isBlacklistToken(String token) {
+        return blacklistTokenService.isBlacklisted(token);
+    }
+
+    /**
+     * AccessToken을 갱신하는 메서드
+     * @param httpServletResponse Token을 갖고 있을 HttpServletResponse 객체
+     * @param user AccessToken을 갱신할 유저
+     */
+    private void refreshAccessToken(HttpServletResponse httpServletResponse, User user) {
+        try {
+            String newToken = tokenService.refreshAccessToken(user);
+
+            if(newToken == null) {
+                throw new IllegalArgumentException("Need Login");
+            }
+
+            jwtUtil.addJwtToCookie(httpServletResponse, newToken);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -79,5 +134,30 @@ public class JwtFilter implements Filter {
         String method = request.getMethod();
 
         return method.compareTo("DELETE") == 0 || !(StringUtils.hasText(url) && url.startsWith("/api/users"));
+    }
+
+    /**
+     * Token으로부터 userId를 추출해내는 함수
+     * @param tokenValue 추출할 Token값
+     * @return -1 : access, refresh 토큰 둘 다 만료된 경우 / 그 외 : userId
+     */
+    private int getUserIdFromTokenValue(String tokenValue) {
+        String token = jwtUtil.substringToken(tokenValue);
+        int userId = 0;
+
+        try {
+            userId = jwtUtil.getUserIdFromToken(token);
+        } catch(ExpiredJwtException e) {
+            // 토큰이 만료된 경우, refresh 토큰으로 체크
+            String refreshToken = tokenService.getRefreshTokenByAccessToken(tokenValue);
+
+            try {
+                userId = jwtUtil.getUserIdFromToken(refreshToken);
+            } catch(ExpiredJwtException e2) {
+                return -1;
+            }
+        }
+
+        return userId;
     }
 }
