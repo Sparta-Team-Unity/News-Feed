@@ -1,5 +1,7 @@
 package com.sparta.newsfeed.domain.controller;
 
+import com.sparta.newsfeed.config.AuthUser;
+import com.sparta.newsfeed.domain.dto.UserDto;
 import com.sparta.newsfeed.domain.dto.UserRequestDto;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.service.UserService;
@@ -33,13 +35,12 @@ public class UserController {
 
     /**
      * request에 들어있는 User사용법
-     * @param request
-     * @return
+     * @param user 유저 정보가 있는 Dto
+     * @return string화 된 user
      */
     @DeleteMapping("/users/test")
-    public String test(HttpServletRequest request) {
-        User user = (User)request.getAttribute("user");
+    public String test(@AuthUser UserDto user) {
 
-        return user.getUserId() + user.getPassword();
+        return user.toString();
     }
 }

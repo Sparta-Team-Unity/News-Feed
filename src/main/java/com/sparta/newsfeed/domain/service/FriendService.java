@@ -72,7 +72,7 @@ public class FriendService {
 
         for (Friend wait : wiatList) {
             int waitsId = wait.getFromUser().getUserId();
-            LocalDateTime time = LocalDateTime.parse(wait.getCreateAt());
+            LocalDateTime time = wait.getCreateAt();
             responseList.add(new WaitsDto(waitsId,time));
         }
         return new WaitsResponseDto(responseList);

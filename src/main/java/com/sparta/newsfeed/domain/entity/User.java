@@ -19,6 +19,9 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false, name = "password")
     private String password;
 
@@ -28,8 +31,9 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Post> postList = new ArrayList<>();
 
-    public User(String email, String password) {
+    public User(String email, String password, String name) {
         this.email = email;
         this.password = password;
+        this.name = name;
     }
 }
