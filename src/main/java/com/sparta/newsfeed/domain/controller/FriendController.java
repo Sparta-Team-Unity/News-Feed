@@ -37,5 +37,10 @@ public class FriendController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{followid}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable("followid") Integer followid) {
+        friendService.deleteFriend(followid);
+        return ResponseEntity.ok().build();
+    }
 
 }
