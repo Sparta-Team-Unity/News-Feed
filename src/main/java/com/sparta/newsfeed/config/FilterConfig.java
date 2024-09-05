@@ -50,6 +50,7 @@ public class FilterConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         // 우선 모든 URL에 대한 접근이 가능하게 생성
                         .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // 그 외에는 인증이 되어야 한다.
                         .anyRequest().authenticated()
         );
