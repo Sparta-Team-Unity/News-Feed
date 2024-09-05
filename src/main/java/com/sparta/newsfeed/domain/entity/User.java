@@ -38,4 +38,8 @@ public class User extends Timestamped {
         this.password = password;
         this.name = name;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
