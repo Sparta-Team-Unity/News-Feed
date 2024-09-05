@@ -17,7 +17,7 @@ public enum ErrorCode {
     // Friend ErrorCode
     SAME_PERSON(HttpStatus.CONFLICT, "자기 자신에게 친구 신청할 수 없습니다."),
     ALREADY_FRIEND(HttpStatus.CONFLICT, "이미 친구입니다."),
-    DUPLICATE_FRIEND(HttpStatus.CONFLICT, "Duplicate Friend"),
+    DUPLICATE_FRIEND(HttpStatus.CONFLICT, "이미 친구 신청을 하셨거나 친구입니다."),
     NOT_FRIEND(HttpStatus.UNAUTHORIZED, "해당 유저와 친구가 아닙니다."),
     CANNOTFOUND_FRIENDREQUEST(HttpStatus.CONFLICT, "해당 친구 요청을 찾을 수 없습니다."),
 

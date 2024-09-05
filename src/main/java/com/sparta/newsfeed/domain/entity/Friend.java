@@ -20,13 +20,17 @@ public class Friend extends Timestamped{
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "to_user_id")
+    @JoinColumn(name = "to_user", nullable = false)
     private User toUser;
 
     @ManyToOne
-    @JoinColumn(name = "from_user_id")
+    @JoinColumn(name = "from_user", nullable = false)
     private User fromUser;
+
+    @Column(name = "is_accepted", nullable = false)
     private boolean isAccepted;
+
+    @Column(name = "request_at", nullable = false)
     private LocalDateTime requestAt;
 
 
