@@ -6,6 +6,9 @@ import com.sparta.newsfeed.config.PasswordUtil;
 import com.sparta.newsfeed.domain.dto.UserRequestDto;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,16 +59,26 @@ public class UserService {
      * @return 해당 유저의 Jwt토큰
      */
     @Transactional(readOnly = true)
-    public String login(UserRequestDto userRequestDto) {
+    public String login(UserRequestDto userRequestDto, HttpServletResponse response) {
         // 유저 검증
         User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow();
 
         // 비밀번호 검증
-        String bcryptPassword = passwordEncoder.encode(userRequestDto.getPassword());
-        if (!passwordEncoder.matches(bcryptPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) {
             return null;
         }
 
+        String token = jwtUtil.createToken(user.getUserId());
+        jwtUtil.addJwtToCookie(response, token);
         return jwtUtil.createToken(user.getUserId());
+    }
+
+    /**
+     * 로그아웃 처리하는 함수 : cookie에 담겨져 있는 토큰을 제거
+     * @param request Jwt토큰을 삭제할 Request객체
+     * @param response 토큰이 갱신될 Response객체
+     */
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        jwtUtil.deleteJwtInCookie(request, response);
     }
 }

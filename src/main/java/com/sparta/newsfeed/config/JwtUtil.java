@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +27,7 @@ public class JwtUtil {
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 유지 시간 60
     private final long TOKEN_EXPIRES_IN_SECONDS = 60 * 60 * 1000;
+
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -132,12 +132,39 @@ public class JwtUtil {
      * @return Token값 / null : Token이 존재하지 않음
      */
     public String getTokenFromRequest(HttpServletRequest request) {
+        Cookie cookie = findTokenCookie(request);
+        if(cookie != null) {
+            return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+        }
+
+        return null;
+    }
+
+    /**
+     * Cookie에 있는 Jwt토큰을 삭제하는 함수
+     * @param request Token이 담겨 있는 request Servlet
+     */
+    public void deleteJwtInCookie(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = findTokenCookie(request);
+
+        if(cookie != null) {
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
+    }
+
+    /**
+     * request Servlet에 담겨 있는 Token객체를 반환하는 함수
+     * @param request Token이 담겨 있는 request Servlet
+     * @return null : Token이 존재하지 않는 경우 / Cookie : Token이 존재하는 경우
+     */
+    private Cookie findTokenCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-                    return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                    return cookie;
                 }
             }
         }
