@@ -5,13 +5,14 @@ import com.sparta.newsfeed.domain.dto.FriendResponseDto;
 import com.sparta.newsfeed.domain.dto.WaitsDto;
 import com.sparta.newsfeed.domain.dto.WaitsResponseDto;
 import com.sparta.newsfeed.domain.entity.Friend;
+import com.sparta.newsfeed.domain.exception.AlreadyFriend;
 import com.sparta.newsfeed.domain.exception.DuplicateFriendException;
+import com.sparta.newsfeed.domain.exception.NoFriend;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.sparta.newsfeed.domain.entity.User;
-import com.sparta.newsfeed.domain.exception.AlreadyFriend;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +102,29 @@ public class FriendService {
         }else {
             // 친구 요청 찾을 수 없을 때
             throw new NoSuchElementException("Can Not Found Friend Request");
+        }
+    }
+
+    public void deleteFriend(Integer followid) {
+        // fromUser 추후에 JWT 에서 추출할 것
+        // user -> 로그인 중인 현재 사용자
+        User user = new User();
+
+        User targetUser = userRepository.findById(followid).orElseThrow(()->new NoSuchElementException("User Not Found"));
+
+        //친구 관계인지 확인
+        if(friendRepository.existsByToUserAndFromUserAndIsAccepted(user, targetUser, true)) {
+
+            //친구 일 때
+            Friend friend = friendRepository.findByToUserAndFromUserAndIsAccepted(user,targetUser,true);
+            friendRepository.delete(friend);
+        } else if (friendRepository.existsByToUserAndFromUserAndIsAccepted(targetUser,user, true)) {
+            // 친구 일 때
+            Friend friend = friendRepository.findByToUserAndFromUserAndIsAccepted(targetUser,user,true);
+            friendRepository.delete(friend);
+        } else {
+            // 친구가 아닐 때
+            throw new NoFriend();
         }
     }
 }
