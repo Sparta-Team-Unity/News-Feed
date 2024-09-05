@@ -12,6 +12,7 @@ import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -85,7 +86,13 @@ public class PostService {
         log.info("userList: {}", userList);
         userList.add(user);
 
-        return postRepository.findByUserInOrderByCreateAtDesc(userList, pageable)
+        Page<Post> postPage = postRepository.findByUserInOrderByCreateAtDesc(userList, pageable)
+                .orElseThrow(()-> new UnityException(ErrorCode.POST_NOT_FOUND));
+        if(postPage.isEmpty()){
+            throw new UnityException(ErrorCode.POST_NOT_FOUND);
+        }
+
+        return postPage
                 .map(post -> PostResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
