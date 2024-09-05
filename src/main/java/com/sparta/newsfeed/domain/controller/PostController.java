@@ -5,8 +5,12 @@ import com.sparta.newsfeed.domain.dto.*;
 import com.sparta.newsfeed.domain.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 
 @RestController
@@ -23,8 +27,9 @@ public class PostController {
      */
     @PostMapping("/posts")
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUser UserDto userDto){
-        return ResponseEntity.ok(postService.createPost(postRequestDto, userDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(postRequestDto, userDto));
     }
+
 
     /**
      * 본인, 친구 게시물 전체 조회
@@ -55,7 +60,7 @@ public class PostController {
             @RequestBody PostUpdateRequestDto postUpdateRequestDto,
             @AuthUser UserDto userDto
     ){
-        return ResponseEntity.ok(postService.updatePost(postId, postUpdateRequestDto, userDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.updatePost(postId, postUpdateRequestDto, userDto));
     }
 
     /**
