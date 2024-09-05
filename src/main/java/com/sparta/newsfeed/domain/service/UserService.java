@@ -105,9 +105,16 @@ public class UserService {
         );
 
         // 토큰을 Blacklist에 삽입
-        blacklistTokenService.addBlacklistToken(user.getToken().getAccessToken());
+        addBlacklistToken(user.getToken().getAccessToken());
     }
 
+    /**
+     * 해당 토큰을 BlackList에 등록하는 메서드
+     * @param token BlackList에 등록할 토큰
+     */
+    private void addBlacklistToken(String token) {
+        blacklistTokenService.addBlacklistToken(token);
+    }
     /**
      * 로그아웃 하는 메서드
      * @param userDto 현재 로그인 중인 유저 정보
@@ -116,5 +123,17 @@ public class UserService {
     public void signOut(UserDto userDto) {
         User user = userRepository.findById(userDto.getId()).orElseThrow();
         user.signOut();
+
+        addBlacklistToken(user.getToken().getAccessToken());
+    }
+
+    /**
+     * id로 유저를 조회하는 메서드
+     * @param id 유저 id
+     * @return 조회한 유저 객체
+     */
+    @Transactional
+    public User findUserById(int id) {
+        return userRepository.findById(id).orElseThrow(() -> new UnityException(USER_NOT_EXIST));
     }
 }

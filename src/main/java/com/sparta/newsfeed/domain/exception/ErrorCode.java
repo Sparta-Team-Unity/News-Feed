@@ -9,7 +9,8 @@ public enum ErrorCode {
     // Token ErrordeCode
     EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, "재로그인 해주세요."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "로그아웃 상태입니다."),
-
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰이 존재하지 않습니다."),
+    JWT_NOT_SUPPORT(HttpStatus.HTTP_VERSION_NOT_SUPPORTED, "토큰을 지원하지 않습니다"),
     // User ErrorCode
     USER_NOT_EXIST(HttpStatus.NOT_FOUND, "User Not Found"),
     MISS_MATCH_PASSWORD(HttpStatus.UNAUTHORIZED, "현재 입력하신 비밀번호가 기존 비밀번호와 일치하지 않습니다."),

@@ -40,7 +40,7 @@ public class TokenService {
      * @return 갱신된 AccessToken
      */
     @Transactional
-    public String refreshAccessToken(User user) throws Exception {
+    public String refreshAccessToken(User user) {
         Token token = getToken(user);
         String tokenBody = jwtUtil.substringToken(token.getRefreshToken());
 
@@ -49,6 +49,7 @@ public class TokenService {
             throw new UnityException(ErrorCode.EXPIRED_TOKEN);
         }
 
+        // 현재 유저에게 엑세스 토큰 생성
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
 
         // 유저 access 토큰 갱신
@@ -56,16 +57,6 @@ public class TokenService {
         tokenRepository.save(token);
 
         return accessToken;
-    }
-
-    /**
-     *
-     * @param user
-     * @throws Exception
-     */
-    @Transactional
-    public void eraseToken(User user) throws Exception {
-        tokenRepository.deleteById(getToken(user).getId());
     }
 
     /**
@@ -92,9 +83,9 @@ public class TokenService {
     }
 
     /**
-     *
-     * @param accessTokenValue
-     * @return
+     * 해당 Access토큰과 관련된 Refresh토큰을 반환하는 메서드
+     * @param accessTokenValue Access토큰 내용
+     * @return Refresh 토큰
      */
     public String getRefreshTokenByAccessToken(String accessTokenValue) {
         Token token = tokenRepository.findByAccessToken(accessTokenValue).orElseThrow();
