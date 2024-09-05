@@ -1,5 +1,7 @@
 package com.sparta.newsfeed.config.filter;
 
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -139,13 +141,12 @@ public class JwtUtil {
             // 만료된 토큰인지 확인
             return !claimsJws.getBody().getExpiration().before(date);
         } catch (SecurityException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-            logger.error("Invalid Token");
+            throw new UnityException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException exception) {
             return false;
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported Jwt");
+            throw new UnityException(ErrorCode.JWT_NOT_SUPPORT);
         }
-        return false;
     }
 
     /**
@@ -181,19 +182,6 @@ public class JwtUtil {
         }
 
         return null;
-    }
-
-    /**
-     * Cookie에 있는 Jwt토큰을 삭제하는 함수
-     * @param request Token이 담겨 있는 request Servlet
-     */
-    public void deleteJwtInCookie(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = findTokenCookie(request);
-
-        if(cookie != null) {
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        }
     }
 
     /**

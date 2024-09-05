@@ -6,6 +6,7 @@ import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import com.sparta.newsfeed.domain.service.BlacklistTokenService;
 import com.sparta.newsfeed.domain.service.TokenService;
+import com.sparta.newsfeed.domain.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,19 +18,18 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-@EnableWebSecurity(debug = true)
 @Slf4j(topic = "JwtFilter")
 @Order(1)
 public class JwtFilter implements Filter {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
     private final TokenService tokenService;
     private final BlacklistTokenService blacklistTokenService;
 
-    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository, TokenService tokenService, BlacklistTokenService blacklistTokenService) {
+    public JwtFilter(JwtUtil jwtUtil, UserService userService, TokenService tokenService, BlacklistTokenService blacklistTokenService) {
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.tokenService = tokenService;
         this.blacklistTokenService = blacklistTokenService;
     }
@@ -51,7 +51,7 @@ public class JwtFilter implements Filter {
         if (!isNeedTokenURL(httpServletRequest)) {
             filterChain.doFilter(httpServletRequest, servletResponse);
         } else {
-            tokenFilter(httpServletRequest, servletResponse, filterChain);
+            tokenFilter(httpServletRequest, servletResponse);
             filterChain.doFilter(servletRequest, servletResponse);
         }
     }
@@ -61,9 +61,10 @@ public class JwtFilter implements Filter {
      * @param servletRequest User정보를 탑제할 요청이 들어온 정보
      * @param servletResponse 토큰 갱신이 필요하다면 갱신할 반환 정보
      */
-    private void tokenFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+    private void tokenFilter(ServletRequest servletRequest, ServletResponse servletResponse) {
         String tokenValue = jwtUtil.getTokenFromRequest((HttpServletRequest) servletRequest);
 
+        // 이미 블랙리스트에 등록됐는지 확인
         if (isBlacklistToken(tokenValue)) {
             throw new UnityException(ErrorCode.INVALID_TOKEN);
         }
@@ -72,23 +73,20 @@ public class JwtFilter implements Filter {
         if (StringUtils.hasText(tokenValue)) {
             // token 내용 추출
             String token = jwtUtil.substringToken(tokenValue);
+
             // 해당 토큰 관련된 유저가 있는지 확인
             int userId = getUserIdFromTokenValue(tokenValue);
-            if(userId == -1) {
-                throw new UnityException(ErrorCode.EXPIRED_TOKEN);
-            }
 
             // 토큰에 실린 id를 통해 유저 조회
-            User user = userRepository.findById(userId).orElseThrow(
-                    () -> new NullPointerException("Not Found User")
-            );
+            User user = userService.findUserById(userId);
 
             // access 토큰을 갱신한다.
             refreshAccessToken((HttpServletResponse) servletResponse, user);
+
             // request에 유저 정보 탑제
             servletRequest.setAttribute("user", user);
         } else {
-            throw new IllegalArgumentException("Token Not Found");
+            throw new UnityException(ErrorCode.TOKEN_NOT_FOUND);
         }
     }
 
@@ -107,18 +105,9 @@ public class JwtFilter implements Filter {
      * @param user AccessToken을 갱신할 유저
      */
     private void refreshAccessToken(HttpServletResponse httpServletResponse, User user) {
-        try {
-            String newToken = tokenService.refreshAccessToken(user);
+        String newToken = tokenService.refreshAccessToken(user);
 
-            if(newToken == null) {
-                throw new IllegalArgumentException("Need Login");
-            }
-
-            jwtUtil.addJwtToCookie(httpServletResponse, newToken);
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        jwtUtil.addJwtToCookie(httpServletResponse, newToken);
     }
 
     /**
@@ -149,9 +138,11 @@ public class JwtFilter implements Filter {
             String refreshToken = tokenService.getRefreshTokenByAccessToken(tokenValue);
 
             try {
+                // refresh Token으로 유저 정보 조회
                 userId = jwtUtil.getUserIdFromToken(refreshToken);
             } catch(ExpiredJwtException e2) {
-                return -1;
+                // 둘다 실패시 재로그인 필요 에러코드 반환
+                throw new UnityException(ErrorCode.EXPIRED_TOKEN);
             }
         }
 

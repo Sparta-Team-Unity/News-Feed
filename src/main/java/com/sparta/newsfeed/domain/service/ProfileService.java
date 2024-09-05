@@ -6,7 +6,8 @@ import com.sparta.newsfeed.domain.dto.profile.ProfileSaveRequestDto;
 import com.sparta.newsfeed.domain.dto.profile.ProfileViewResponseDto;
 import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.entity.User;
-import com.sparta.newsfeed.domain.exception.*;
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,10 @@ public class ProfileService {
     private final PasswordUtil passwordUtil;
 
     /**
-     *
-     * @param userId
-     * @param userDto
-     * @return
+     * 유저 정보를 조회하는 메서드
+     * @param userId 조회할 유저 Id
+     * @param userDto 로그인 중인 유저 Id
+     * @return 조회한 유저 객체
      */
     @Transactional(readOnly = true)
     public ProfileViewResponseDto viewUsersProfile(Integer userId, UserDto userDto) {
@@ -40,6 +41,11 @@ public class ProfileService {
         return profileViewResponseDto;
     }
 
+    /**
+     * 유저 정보를 갱신하는 메서드 ( 비밀번호 변경 )
+     * @param profileSaveRequestDto 변경할 내용 객체
+     * @param userDto 로그인 중인 유저 정보
+     */
     @Transactional
     public void updateProfile(ProfileSaveRequestDto profileSaveRequestDto, UserDto userDto) {
         User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));

@@ -12,7 +12,6 @@ import com.sparta.newsfeed.domain.exception.ErrorCode;
 import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.PostRepository;
-import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final FriendRepository friendRepository;
 
     /**
@@ -162,7 +161,7 @@ public class PostService {
      * @return 조회한 유저
      */
     private User findUserById(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
+        return userService.findUserById(userId);
     }
 
     /**
@@ -171,7 +170,6 @@ public class PostService {
      * @param postId 게시글 Id
      * @return 게시글 내용
      */
-    // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
     private Post postUserAuthentication(Integer userId, Integer postId){
         // 해당 user 존재하는지 확인
         User user = findUserById(userId);
