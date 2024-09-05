@@ -51,7 +51,6 @@ public class FriendService {
         friendList.addAll(friendRepository.findByToUserAndIsAccepted(user,true));
 
         List<FollowDto> responseList = new ArrayList<>();
-        System.out.println("서비스에 들어왔음");
         // friendList 순회 -> FollowDto 객체들을 만들어 responseList 갱신
         for (Friend friend : friendList) {
             int friendId = friend.getFromUser().getUserId() == user.getUserId()
@@ -60,7 +59,6 @@ public class FriendService {
 
             responseList.add(new FollowDto(friendId));
         }
-        System.out.println("서비스 에서 나갈거야");
         return new FriendResponseDto(responseList);
     }
 
