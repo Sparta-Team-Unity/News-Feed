@@ -12,7 +12,7 @@ import com.sparta.newsfeed.domain.entity.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 
 
 @Service
@@ -23,8 +23,8 @@ public class FriendService {
     private final UserRepository userRepository;
 
     //친구 신청 메서드
-    public void addFriend(Integer followid, UserDto userDto) {
-        User toUser = targetUser(followid);
+    public void addFriend(Integer followId, UserDto userDto) {
+        User toUser = targetUser(followId);
         User currentUser = currentUser(userDto);
         if(isSamePerson(toUser, currentUser)) {
             //친구 신청 보낸 사람이랑 받은사람 같을때
@@ -79,13 +79,13 @@ public class FriendService {
         return new WaitsResponseDto(responseList);
     }
 
-    public void reciveFriend(Integer followid, UserDto userDto) {
+    public void reciveFriend(Integer followId, UserDto userDto) {
 
         // fromUser 추후에 JWT 에서 추출할 것
         // user -> 로그인 중인 현재 사용자
         User currentUser = currentUser(userDto);
         //fromUser -> 친구 요청을 보낸 유저
-        User fromUser = targetUser(followid);
+        User fromUser = targetUser(followId);
 
         // fromUser가 user에게 보낸 친구 요청 있는지 확인
         // 이미 친구 관계인지 확인
@@ -105,11 +105,11 @@ public class FriendService {
     }
 
 
-    public void deleteFriend(Integer followid, UserDto userDto) {
+    public void deleteFriend(Integer followId, UserDto userDto) {
         // fromUser 추후에 JWT 에서 추출할 것
         // user -> 로그인 중인 현재 사용자
         User currentUser = currentUser(userDto);
-        User targetUser = targetUser(followid);
+        User targetUser = targetUser(followId);
         //자기 자신인지 확인
         if(isSamePerson(currentUser, targetUser)) {
             throw new UnityException(ErrorCode.SAME_PERSON);

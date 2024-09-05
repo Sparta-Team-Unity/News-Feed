@@ -8,6 +8,9 @@ import com.sparta.newsfeed.domain.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,18 +19,17 @@ public class FriendController {
     private final FriendService friendService;
 
     //친구 신청
-    @PostMapping("/{followid}")
-    public ResponseEntity<Void> addFriend(@PathVariable("followid") Integer followid, @AuthUser UserDto userDto) {
-        friendService.addFriend(followid, userDto);
-        return ResponseEntity.ok().build();
+    @PostMapping("/{followId}")
+    public ResponseEntity<Void> addFriend(@PathVariable("followId") Integer followId, @AuthUser UserDto userDto) {
+        friendService.addFriend(followId, userDto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{followId}").buildAndExpand(followId).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     //친구목록조회
     @GetMapping
     public ResponseEntity<FriendResponseDto> friendsInquiry(@AuthUser UserDto userDto){
-        System.out.println("요청 제대로 들어옴");
         FriendResponseDto response = friendService.friendsInquiry(userDto);
-        System.out.println("서비스 나왔어");
         return ResponseEntity.ok(response);
     }
 
@@ -39,16 +41,16 @@ public class FriendController {
     }
 
     //친구 수락
-    @PutMapping("/{followid}")
-    public ResponseEntity<Void> reciveFriend(@PathVariable("followid") Integer followid, @AuthUser UserDto userDto) {
-        friendService.reciveFriend(followid,userDto);
+    @PutMapping("/{followId}")
+    public ResponseEntity<Void> reciveFriend(@PathVariable("followId") Integer followId, @AuthUser UserDto userDto) {
+        friendService.reciveFriend(followId,userDto);
         return ResponseEntity.ok().build();
     }
 
     //친구삭제
-    @DeleteMapping("/{followid}")
-    public ResponseEntity<Void> deleteFriend(@PathVariable("followid") Integer followid, @AuthUser UserDto userDto) {
-        friendService.deleteFriend(followid, userDto);
+    @DeleteMapping("/{followId}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable("followId") Integer followId, @AuthUser UserDto userDto) {
+        friendService.deleteFriend(followId, userDto);
         return ResponseEntity.ok().build();
     }
 
