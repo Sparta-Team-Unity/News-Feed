@@ -6,9 +6,7 @@ import com.sparta.newsfeed.domain.dto.ProfileSaveRequestDto;
 import com.sparta.newsfeed.domain.dto.ProfileViewResponseDto;
 import com.sparta.newsfeed.domain.dto.UserDto;
 import com.sparta.newsfeed.domain.entity.User;
-import com.sparta.newsfeed.domain.exception.InvalidPasswordFormException;
-import com.sparta.newsfeed.domain.exception.MissMatchPasswordException;
-import com.sparta.newsfeed.domain.exception.PasswordEqualsException;
+import com.sparta.newsfeed.domain.exception.*;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,8 +30,8 @@ public class ProfileService {
      */
     @Transactional(readOnly = true)
     public ProfileViewResponseDto viewUsersProfile(Integer userId, UserDto userDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User Not Found"));
-        User loginUser = userRepository.findById(userDto.getId()).orElseThrow(() -> new NoSuchElementException("User Not Found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
+        User loginUser = userRepository.findById(userDto.getId()).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
 
         ProfileViewResponseDto profileViewResponseDto = new ProfileViewResponseDto(user.getEmail(), user.getCreateAt());
 
@@ -46,16 +44,16 @@ public class ProfileService {
 
     @Transactional
     public void updateProfile(ProfileSaveRequestDto profileSaveRequestDto, UserDto userDto) {
-        User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new NoSuchElementException("User Not Found"));
+        User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
 
         if (!passwordEncoder.matches(profileSaveRequestDto.getCurrentPassword(), user.getPassword())) {
-            throw new MissMatchPasswordException();
+            throw new UnityException(ErrorCode.MISS_MATCH_PASSWORD);
         }
         if(profileSaveRequestDto.getCurrentPassword().equals(profileSaveRequestDto.getNewPassword())) {
-            throw new PasswordEqualsException();
+            throw new UnityException(ErrorCode.DUPLICATE_PASSWORD);
         }
         if (!passwordUtil.isValidPassword(profileSaveRequestDto.getNewPassword())) {
-            throw new InvalidPasswordFormException();
+            throw new UnityException(ErrorCode.INVALID_PASSWORD_FORM);
         }
         user.updatePassword(passwordEncoder.encode(profileSaveRequestDto.getNewPassword()));
         userRepository.save(user);
