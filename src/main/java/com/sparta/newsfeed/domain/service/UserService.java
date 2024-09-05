@@ -6,7 +6,6 @@ import com.sparta.newsfeed.config.PasswordUtil;
 import com.sparta.newsfeed.domain.dto.UserRequestDto;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class UserService {
 
         // 비밀번호 암호화 후 저장
         String bcryptPassword = passwordEncoder.encode(userRequestDto.getPassword());
-        User newUser = new User(userRequestDto.getEmail(), bcryptPassword);
+        User newUser = new User(userRequestDto.getEmail(), bcryptPassword, userRequestDto.getName());
 
         userRepository.save(newUser);
     }
