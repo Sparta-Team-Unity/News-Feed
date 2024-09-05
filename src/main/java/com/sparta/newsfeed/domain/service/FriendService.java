@@ -56,7 +56,8 @@ public class FriendService {
         // friendList 순회 -> FollowDto 객체들을 만들어 responseList 갱신
         for (Friend friend : friendList) {
             int friendId = findFriendId(friend, currentUser);
-            responseList.add(new FollowDto(friendId));
+            String userName = userRepository.findById(friendId).get().getName();
+            responseList.add(new FollowDto(friendId, userName));
         }
         return new FriendResponseDto(responseList);
     }
@@ -75,7 +76,8 @@ public class FriendService {
         for (Friend wait : wiatList) {
             int waitsId = wait.getFromUser().getUserId();
             LocalDateTime time = wait.getCreateAt();
-            responseList.add(new WaitsDto(waitsId,time));
+            String userName = userRepository.findById(waitsId).get().getName();
+            responseList.add(new WaitsDto(waitsId,time,userName));
         }
         return new WaitsResponseDto(responseList);
     }

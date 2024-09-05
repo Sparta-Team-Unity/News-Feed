@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 public class WaitsDto {
     private int userId;
     private LocalDateTime time;
-    public WaitsDto(int userId, LocalDateTime time) {
+    private String userName;
+    public WaitsDto(int userId, LocalDateTime time, String userName) {
         this.userId = userId;
         this.time = time;
+        this.userName = userName;
     }
 }
