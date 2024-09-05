@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.passwordconfig;
 
 import org.springframework.stereotype.Component;
 
@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 
 @Component
 public class PasswordUtil {
-    final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!#^()%*?&])[A-Za-z\\d@$!%*?&]{8,10}$";
+    // 특수문자, 대문자, 소문자, 숫자 한개씩 들어간 8 ~ 15자리 비밀번호
+    final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!#^()%*?&])[A-Za-z\\d@$!%*?&]{8,15}$";
 
     /**
      * 암호가 조건에 부합하는지 확인하는 메서드

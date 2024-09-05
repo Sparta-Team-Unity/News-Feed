@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.domain.dto;
+package com.sparta.newsfeed.domain.dto.profile;
 
 import lombok.Getter;
 

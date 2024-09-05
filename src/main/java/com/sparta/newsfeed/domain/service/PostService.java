@@ -1,6 +1,10 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.domain.dto.*;
+import com.sparta.newsfeed.domain.dto.post.PostRequestDto;
+import com.sparta.newsfeed.domain.dto.post.PostResponseDto;
+import com.sparta.newsfeed.domain.dto.post.PostUpdateRequestDto;
+import com.sparta.newsfeed.domain.dto.post.PostUpdateResponseDto;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.entity.Post;
 import com.sparta.newsfeed.domain.entity.User;
@@ -12,16 +16,13 @@ import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -34,10 +35,10 @@ public class PostService {
     private final FriendRepository friendRepository;
 
     /**
-     * 게시글 생성
-     * @param postRequestDto
-     * @param userDto
-     * @return
+     * 게시글 생성해주는 메서드
+     * @param postRequestDto 게시글 작성 내용
+     * @param userDto 로그인 중인 유저 정보
+     * @return 작성된 게시글 정보
      */
     @Transactional
     public PostResponseDto createPost(PostRequestDto postRequestDto, UserDto userDto) {
@@ -59,10 +60,10 @@ public class PostService {
 
     /**
      * 게시글 조회 (자기자신 + 친구 게시글 조회)
-     * @param page
-     * @param size
-     * @param userDto
-     * @return
+     * @param page 조회할 페이지
+     * @param size 페이지 크기
+     * @param userDto 현재 로그인 중인 유저 정보
+     * @return 본인, 친구 전체 게시물 중 해당 페이지 내용
      */
     public Page<PostResponseDto> getAllPosts(int page, int size, UserDto userDto) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -104,6 +105,13 @@ public class PostService {
                 );
     }
 
+    /**
+     * 게시글 수정 메서드
+     * @param postId 수정할 게시글 Id
+     * @param postUpdateRequestDto 수정할 게시글 내용
+     * @param userDto 로그인된 유저 정보
+     * @return 수정된 게시글 내용
+     */
     @Transactional
     public PostUpdateResponseDto updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto, UserDto userDto) {
         // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
@@ -125,6 +133,11 @@ public class PostService {
 
     }
 
+    /**
+     * 게시글 삭제하는 메서드
+     * @param postId 삭제할 게시글 Id
+     * @param userDto 로그인된 유저 정보
+     */
     @Transactional
     public void deletePost(Integer postId, UserDto userDto) {
         // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
@@ -133,16 +146,31 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // postId로 post 객체 찾는 메서드
+
+    /**
+     * postId로 게시글을 조회하는 메서드
+     * @param postId 조회할 게시글 Id
+     * @return 조회한 게시글
+     */
     private Post findPostById(Integer postId) {
         return postRepository.findById(postId).orElseThrow(()->new UnityException(ErrorCode.POST_NOT_EXIST));
     }
 
-    // userId로 User 객체 찾는 메서드
+    /**
+     * userId로 User를 조회하는 메서드
+     * @param userId 조회할 유저 Id
+     * @return 조회한 유저
+     */
     private User findUserById(Integer userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
     }
 
+    /**
+     * 해당 Post와 User가 존재하는지 여부 & 작성자 인증
+     * @param userId 유저 Id
+     * @param postId 게시글 Id
+     * @return 게시글 내용
+     */
     // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
     private Post postUserAuthentication(Integer userId, Integer postId){
         // 해당 user 존재하는지 확인
