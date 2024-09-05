@@ -5,6 +5,7 @@ public class FollowDto {
     private int userId;
 
     public FollowDto(int userId) {
+
         this.userId = userId;
     }
 }
