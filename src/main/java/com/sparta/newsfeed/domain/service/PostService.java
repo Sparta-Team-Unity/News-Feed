@@ -1,29 +1,26 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.domain.dto.FollowDto;
-import com.sparta.newsfeed.domain.dto.PostRequestDto;
-import com.sparta.newsfeed.domain.dto.PostResponseDto;
-import com.sparta.newsfeed.domain.dto.PostUpdateRequestDto;
+import com.sparta.newsfeed.domain.dto.*;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.entity.Post;
 import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.PostRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -35,10 +32,16 @@ public class PostService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
 
+    /**
+     * 게시글 생성
+     * @param postRequestDto
+     * @param userDto
+     * @return
+     */
     @Transactional
-    public PostResponseDto createPost(PostRequestDto postRequestDto) {
-        // 해당 유저가 존재하는지 확인 (필요한지는 모르겠어요... 로그인 상태이면 필요 x)
-        User user = userRepository.findById(postRequestDto.getUserId()).orElseThrow(() -> new NoSuchElementException("User not found"));
+    public PostResponseDto createPost(PostRequestDto postRequestDto, UserDto userDto) {
+        // 해당 유저가 존재하는지 확인
+        User user = findUserById(userDto.getId());
 
         Post newPost = new Post(postRequestDto.getTitle(), postRequestDto.getContents(), user);
         Post savedPost = postRepository.save(newPost);
@@ -53,10 +56,18 @@ public class PostService {
         );
     }
 
-    public Page<PostResponseDto> getAllPosts(int page, int size, int userId) {
+    /**
+     * 게시글 조회 (자기자신 + 친구 게시글 조회)
+     * @param page
+     * @param size
+     * @param userDto
+     * @return
+     */
+    public Page<PostResponseDto> getAllPosts(int page, int size, UserDto userDto) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        // 해당 user가 존재하는지 확인
+        User user = findUserById(userDto.getId());
 
         List<User> userList = new ArrayList<>();
 
@@ -85,37 +96,62 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto) {
-        // 해당 post가 존재하는지 확인
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post not found"));
-
-        // 해당 user 존재하는지 확인
-        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(() -> new NoSuchElementException("User not found"));
-
-        if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
-            throw new NoSuchElementException("작성자가 일치하지 않습니다.");
-        }
+    public PostUpdateResponseDto updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto, UserDto userDto) {
+        // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+        Post post = PostUserAuthentication(userDto.getId(), postId);
 
         post.update(
                 postUpdateRequestDto.getTitle(),
                 postUpdateRequestDto.getContents()
         );
 
+        return new PostUpdateResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContents(),
+                post.getCreateAt(),
+                post.getEditAt(),
+                post.getUser()
+        );
+
     }
 
     @Transactional
-    public void deletePost(Integer postId) {
-        // 해당 post가 존재하는지 확인
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post not found"));
-
-        // user 확인 어떻게 하지??
-        // 해당 user 존재하는지 확인
-//        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(()-> new NoSuchElementException("User not found"));
-//
-//        if(post.getUser() == null || !ObjectUtils.nullSafeEquals(user.getUserId(), post.getUser().getUserId())) {
-//            throw new NoSuchElementException("작성자가 일치하지 않습니다.");
-//        }
+    public void deletePost(Integer postId, UserDto userDto) {
+        // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+        Post post = PostUserAuthentication(userDto.getId(), postId);
 
         postRepository.delete(post);
     }
+
+    // postId로 post 객체 찾는 메서드
+    private Post findPostById(Integer postId) {
+        return postRepository.findById(postId).orElseThrow(()->new UnityException(ErrorCode.POST_NOT_EXIST));
+    }
+
+    // userId로 User 객체 찾는 메서드
+    private User findUserById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
+    }
+
+    // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+    private Post PostUserAuthentication(Integer userId, Integer postId){
+        // 해당 user 존재하는지 확인
+        User user = findUserById(userId);
+
+        // 해당 post가 존재하는지 확인
+        Post post = findPostById(postId);
+
+        // post 작성자와 현재 login 사용자 id 일치 여부 확인
+        if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
+            throw new UnityException(ErrorCode.USER_NOT_EXIST);
+        }
+
+        Map<User, Post> postUserMap = new HashMap<>();
+        postUserMap.put(user,post);
+
+        return post;
+    }
+
+
 }
