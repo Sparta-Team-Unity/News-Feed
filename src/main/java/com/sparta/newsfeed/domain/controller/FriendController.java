@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class FriendController {
     private final FriendService friendService;
 
-    @PostMapping("{/followid}")
+    @PostMapping("/{followid}")
     public ResponseEntity<Void> addFriend(@PathVariable("followid") Integer followid) {
         friendService.addFriend(followid);
         return ResponseEntity.ok().build();
@@ -29,6 +29,12 @@ public class FriendController {
     public ResponseEntity<WaitsResponseDto> friendsInquiryWait(){
         WaitsResponseDto response = friendService.waitsInquiry();
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{followid}")
+    public ResponseEntity<Void> reciveFriend(@PathVariable("followid") Integer followid) {
+        friendService.reciveFriend(followid);
+        return ResponseEntity.ok().build();
     }
 
 

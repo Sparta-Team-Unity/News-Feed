@@ -76,4 +76,15 @@ public class FriendService {
         }
         return new WaitsResponseDto(responseList);
     }
+
+    public void reciveFriend(Integer followid) {
+
+        // fromUser 추후에 JWT 에서 추출할 것
+        // user -> 로그인 중인 현재 사용자
+        User user = new User();
+
+        //fromUser -> 친구 요청을 보낸 유저
+        User fromUser = userRepository.findById(followid).orElseThrow(()->new NoSuchElementException("User Not Found"));
+        friendRepository.updateFriendRequestStatus(fromUser,user,true);
+    }
 }
