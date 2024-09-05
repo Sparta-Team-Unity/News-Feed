@@ -1,13 +1,17 @@
 package com.sparta.newsfeed.domain.dto;
 
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
+import java.time.LocalDateTime;
+@Getter
 public class WaitsDto {
     private int userId;
     private LocalDateTime time;
-    public WaitsDto(int userId, LocalDateTime time) {
+    private String userName;
+    public WaitsDto(int userId, LocalDateTime time, String userName) {
         this.userId = userId;
         this.time = time;
+        this.userName = userName;
     }
 }

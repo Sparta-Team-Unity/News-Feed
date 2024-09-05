@@ -18,7 +18,6 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
     boolean existsByToUserAndFromUserAndIsAccepted(User toUser, User fromUser, boolean isAccepted);
 
     @Modifying
-    @Transactional
     @Query("UPDATE Friend f SET f.isAccepted = :isAccepted WHERE f.fromUser = :fromUser AND f.toUser = :toUser")
     void  updateFriendRequestStatus(User fromUser, User toUser, boolean isAccepted);
 
