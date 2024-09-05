@@ -4,7 +4,6 @@ import com.sparta.newsfeed.config.AuthUser;
 import com.sparta.newsfeed.domain.dto.ProfileSaveRequestDto;
 import com.sparta.newsfeed.domain.dto.ProfileViewResponseDto;
 import com.sparta.newsfeed.domain.dto.UserDto;
-import com.sparta.newsfeed.domain.dto.UserRequestDto;
 import com.sparta.newsfeed.domain.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

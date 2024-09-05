@@ -5,7 +5,6 @@ import com.sparta.newsfeed.domain.dto.UserDto;
 import com.sparta.newsfeed.domain.dto.UserLoginRequestDto;
 import com.sparta.newsfeed.domain.dto.UserSignUpRequestDto;
 import com.sparta.newsfeed.domain.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +18,13 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public void signUp(@RequestBody UserSignUpRequestDto userSigninRequestDto) {
-        userService.signUp(userSigninRequestDto);
+    public void signUp(@RequestBody UserSignUpRequestDto userSignupRequestDto) {
+        userService.signUp(userSignupRequestDto);
+    }
+
+    @DeleteMapping("/users")
+    public void signOut(@AuthUser UserDto user) throws Exception {
+        userService.signOut(user);
     }
 
     @PostMapping("/users/login")
@@ -29,8 +33,8 @@ public class UserController {
     }
 
     @DeleteMapping("/users/logout")
-    public void logOut(HttpServletRequest request, HttpServletResponse response) {
-        userService.logout(request, response);
+    public void logOut(@AuthUser UserDto user) throws Exception {
+        userService.logout(user);
     }
 
     /**

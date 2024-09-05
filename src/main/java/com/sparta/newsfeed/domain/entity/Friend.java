@@ -29,7 +29,6 @@ public class Friend extends Timestamped{
     private boolean isAccepted;
     private LocalDateTime requestAt;
 
-
     public Friend( User toUser, User fromUser) {
         this.toUser = toUser;
         this.fromUser = fromUser;

@@ -1,6 +1,8 @@
 package com.sparta.newsfeed.config;
 
 import com.sparta.newsfeed.domain.repository.UserRepository;
+import com.sparta.newsfeed.domain.service.BlacklistTokenService;
+import com.sparta.newsfeed.domain.service.TokenService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +18,17 @@ public class FilterConfig {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final TokenService tokenService;
+    private final BlacklistTokenService blacklistTokenService;
 
-    public FilterConfig(JwtUtil jwtUtil, UserRepository userRepository) {
+    public FilterConfig(JwtUtil jwtUtil,
+                        UserRepository userRepository,
+                        TokenService tokenService,
+                        BlacklistTokenService blacklistTokenService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
+        this.blacklistTokenService = blacklistTokenService;
     }
 
     /**
@@ -29,7 +38,7 @@ public class FilterConfig {
     @Bean
     public FilterRegistrationBean<JwtFilter> jwtFilterRegistration() {
         FilterRegistrationBean<JwtFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new JwtFilter(jwtUtil, userRepository));
+        filterRegistrationBean.setFilter(new JwtFilter(jwtUtil, userRepository, tokenService, blacklistTokenService));
         filterRegistrationBean.addUrlPatterns("/*");
 
         return filterRegistrationBean;
