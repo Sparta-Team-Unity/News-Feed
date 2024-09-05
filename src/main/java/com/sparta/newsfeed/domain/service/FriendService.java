@@ -11,11 +11,12 @@ import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.sparta.newsfeed.domain.entity.User;
-
+import com.sparta.newsfeed.domain.exception.AlreadyFriend;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +86,21 @@ public class FriendService {
 
         //fromUser -> 친구 요청을 보낸 유저
         User fromUser = userRepository.findById(followid).orElseThrow(()->new NoSuchElementException("User Not Found"));
-        friendRepository.updateFriendRequestStatus(fromUser,user,true);
+
+        // fromUser가 user에게 보낸 친구 요청 있는지 확인
+        // 이미 친구 관계인지 확인
+        if(friendRepository.existsByToUserAndFromUser(user, fromUser)){
+            if(friendRepository.existsByToUserAndFromUserAndIsAccepted(user, fromUser, false)){
+                // 수락 대기중인 친구 요청 찾았을 때 -> 수락 상태로 변화
+                friendRepository.updateFriendRequestStatus(fromUser,user,true);
+            }
+            else {
+                //이미 친구가 된 요청 찾았을 때
+                throw new AlreadyFriend();
+            }
+        }else {
+            // 친구 요청 찾을 수 없을 때
+            throw new NoSuchElementException("Can Not Found Friend Request");
+        }
     }
 }
