@@ -1,8 +1,10 @@
 package com.sparta.newsfeed.domain.dto;
 
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
+import java.time.LocalDateTime;
+@Getter
 public class WaitsDto {
     private int userId;
     private LocalDateTime time;
