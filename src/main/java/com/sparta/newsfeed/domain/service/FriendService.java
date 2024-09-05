@@ -2,10 +2,7 @@ package com.sparta.newsfeed.domain.service;
 
 import com.sparta.newsfeed.domain.dto.*;
 import com.sparta.newsfeed.domain.entity.Friend;
-import com.sparta.newsfeed.domain.exception.AlreadyFriend;
-import com.sparta.newsfeed.domain.exception.DuplicateFriendException;
-import com.sparta.newsfeed.domain.exception.NoFriend;
-import com.sparta.newsfeed.domain.exception.SamePersonException;
+import com.sparta.newsfeed.domain.exception.*;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +28,12 @@ public class FriendService {
         User currentUser = currentUser(userDto);
         if(isSamePerson(toUser, currentUser)) {
             //친구 신청 보낸 사람이랑 받은사람 같을때
-            throw new SamePersonException();
+            throw new UnityException(ErrorCode.SAME_PERSON);
         }
         else {
             if(isExistFriendsRequest(toUser, currentUser)) {
                 // 친구 신청 보낸 사람이랑 받은사람 다르고 신청 내용 이미 존재할 때
-                throw new DuplicateFriendException();
+                throw new UnityException(ErrorCode.DUPLICATE_FRIEND);
             }
             friendRepository.save(new Friend(toUser, currentUser));
         }
@@ -99,11 +96,11 @@ public class FriendService {
             }
             else {
                 //이미 친구가 된 요청 찾았을 때
-                throw new AlreadyFriend();
+                throw new UnityException(ErrorCode.ALREADY_FRIEND);
             }
         }else {
             // 친구 요청 찾을 수 없을 때
-            throw new NoSuchElementException("Can Not Found Friend Request");
+            throw new UnityException(ErrorCode.CANNOTFOUND_FRIENDREQUEST);
         }
     }
 
@@ -113,31 +110,37 @@ public class FriendService {
         // user -> 로그인 중인 현재 사용자
         User currentUser = currentUser(userDto);
         User targetUser = targetUser(followid);
-
-        //친구 관계인지 확인
-        //메서드 따로 빼기
-
-        if(IsAlreadyFriend(currentUser, targetUser)) {
-            //친구 일 때
-            Friend friend = findFriend(currentUser, targetUser);
-            friendRepository.delete(friend);
-        } else if (IsAlreadyFriend(targetUser, currentUser)) {
-            // 친구 일 때
-            Friend friend = findFriend(targetUser, currentUser);
-            friendRepository.delete(friend);
-        } else {
-            // 친구가 아닐 때
-            throw new NoFriend();
+        //자기 자신인지 확인
+        if(isSamePerson(currentUser, targetUser)) {
+            throw new UnityException(ErrorCode.SAME_PERSON);
         }
+        else {
+            //친구 관계인지 확인
+            //메서드 따로 빼기
+
+            if(IsAlreadyFriend(currentUser, targetUser)) {
+                //친구 일 때
+                Friend friend = findFriend(currentUser, targetUser);
+                friendRepository.delete(friend);
+            } else if (IsAlreadyFriend(targetUser, currentUser)) {
+                // 친구 일 때
+                Friend friend = findFriend(targetUser, currentUser);
+                friendRepository.delete(friend);
+            } else {
+                // 친구가 아닐 때
+                throw new UnityException(ErrorCode.NOT_FRIEND);
+            }
+        }
+
     }
     //------------------------------------ 유틸 메서드 ----------------------------------------------//
 
     public User currentUser(UserDto userDto){
-        return userRepository.findById(userDto.getId()).orElseThrow(()->new NoSuchElementException("User Not Found"));
+        return userRepository.findById(userDto.getId()).orElseThrow(()->new UnityException(ErrorCode.USER_NOT_EXIST));
     }
 
     public User targetUser(Integer followid) {
-        return userRepository.findById(followid).orElseThrow(()->new NoSuchElementException("User Not Found"));
+        return userRepository.findById(followid).orElseThrow(()->new UnityException(ErrorCode.USER_NOT_EXIST));
     }
     public boolean isSamePerson(User user1, User user2){
         if(user1.equals(user2)){
