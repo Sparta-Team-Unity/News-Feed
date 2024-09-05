@@ -108,6 +108,8 @@ public class PostService {
         // 해당 post가 존재하는지 확인
         Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post not found"));
 
+        // 작성자와 현재 계정이 일치한지 확인 필요
+
         // user 확인 어떻게 하지??
         // 해당 user 존재하는지 확인
 //        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(()-> new NoSuchElementException("User not found"));

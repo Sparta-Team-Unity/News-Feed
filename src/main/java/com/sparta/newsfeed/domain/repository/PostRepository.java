@@ -10,6 +10,12 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
+    /**
+     * 전달받은 사용자를 생성일 기준 내림차순으로 조회
+     * @param userList
+     * @param pageable
+     * @return
+     */
     Page<Post> findByUserInOrderByCreateAtDesc(List<User> userList, Pageable pageable);
 
 }
