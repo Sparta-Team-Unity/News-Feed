@@ -74,6 +74,7 @@ public class PostService {
         List<Friend> friendList = friendRepository.findByFromUserAndIsAccepted(user, true);
         log.info("friendList: {}", friendList);
         friendList.addAll(friendRepository.findByToUserAndIsAccepted(user, true));
+        log.info("friendList To User: {}", friendList);
         for (Friend friend : friendList) {
             User friendUser = friend.getFromUser().equals(user)
                     ? friend.getToUser()
@@ -81,6 +82,7 @@ public class PostService {
 
             userList.add(friendUser);
         }
+        log.info("userList: {}", userList);
         userList.add(user);
 
         return postRepository.findByUserInOrderByCreateAtDesc(userList, pageable)
@@ -98,28 +100,28 @@ public class PostService {
     @Transactional
     public PostUpdateResponseDto updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto, UserDto userDto) {
         // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
-        Post post = PostUserAuthentication(userDto.getId(), postId);
+        Post post = postUserAuthentication(userDto.getId(), postId);
 
         post.update(
                 postUpdateRequestDto.getTitle(),
                 postUpdateRequestDto.getContents()
         );
 
-        return new PostUpdateResponseDto(
-                post.getId(),
-                post.getTitle(),
-                post.getContents(),
-                post.getCreateAt(),
-                post.getEditAt(),
-                post.getUser()
-        );
+        return PostUpdateResponseDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .contents(post.getContents())
+                .createAt(post.getCreateAt())
+                .editAt(post.getEditAt())
+                .user(post.getUser())
+                .build();
 
     }
 
     @Transactional
     public void deletePost(Integer postId, UserDto userDto) {
         // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
-        Post post = PostUserAuthentication(userDto.getId(), postId);
+        Post post = postUserAuthentication(userDto.getId(), postId);
 
         postRepository.delete(post);
     }
@@ -135,7 +137,7 @@ public class PostService {
     }
 
     // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
-    private Post PostUserAuthentication(Integer userId, Integer postId){
+    private Post postUserAuthentication(Integer userId, Integer postId){
         // 해당 user 존재하는지 확인
         User user = findUserById(userId);
 
@@ -146,9 +148,6 @@ public class PostService {
         if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
             throw new UnityException(ErrorCode.USER_NOT_EXIST);
         }
-
-        Map<User, Post> postUserMap = new HashMap<>();
-        postUserMap.put(user,post);
 
         return post;
     }

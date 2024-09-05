@@ -8,8 +8,11 @@ public enum ErrorCode {
 
     // User ErrorCode
     USER_NOT_EXIST(HttpStatus.NOT_FOUND, "User Not Found"),
+    MISS_MATCH_PASSWORD(HttpStatus.UNAUTHORIZED, "현재 입력하신 비밀번호가 기존 비밀번호와 일치하지 않습니다."),
+    INVALID_PASSWORD_FORM(HttpStatus.NOT_ACCEPTABLE, "비밀번호 형식이 올바르지 않습니다."),
 
     // Profile ErrorCode
+    DUPLICATE_PASSWORD(HttpStatus.NOT_ACCEPTABLE, "바꾸려는 비밀번호와 기존의 비밀번호가 동일합니다."),
 
     // Friend ErrorCode
     ALREADY_FRIEND(HttpStatus.CONFLICT, "이미 친구입니다."),
