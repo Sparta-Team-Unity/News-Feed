@@ -4,9 +4,8 @@ import com.sparta.newsfeed.domain.dto.*;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.entity.Post;
 import com.sparta.newsfeed.domain.entity.User;
-import com.sparta.newsfeed.domain.exception.AuthorNotMatchException;
-import com.sparta.newsfeed.domain.exception.PostNotExistException;
-import com.sparta.newsfeed.domain.exception.UserNotExistException;
+import com.sparta.newsfeed.domain.exception.ErrorCode;
+import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.PostRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
@@ -19,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -65,7 +66,7 @@ public class PostService {
     public Page<PostResponseDto> getAllPosts(int page, int size, UserDto userDto) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        // 해당 post가 존재하는지 확인
+        // 해당 user가 존재하는지 확인
         User user = findUserById(userDto.getId());
 
         List<User> userList = new ArrayList<>();
@@ -95,49 +96,61 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto, UserDto userDto) {
-        // 해당 post가 존재하는지 확인
-        Post post = findPostById(postId);
-
-        // 해당 user 존재하는지 확인
-        User user = findUserById(userDto.getId());
-
-        // post 작성자와 현재 login 사용자 id 일치 여부 확인
-        if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
-            throw new AuthorNotMatchException();
-        }
+    public PostUpdateResponseDto updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto, UserDto userDto) {
+        // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+        Post post = PostUserAuthentication(userDto.getId(), postId);
 
         post.update(
                 postUpdateRequestDto.getTitle(),
                 postUpdateRequestDto.getContents()
         );
 
+        return new PostUpdateResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContents(),
+                post.getCreateAt(),
+                post.getEditAt(),
+                post.getUser()
+        );
+
     }
 
     @Transactional
     public void deletePost(Integer postId, UserDto userDto) {
-        // 해당 post가 존재하는지 확인
-        Post post = findPostById(postId);
-
-        // 해당 user 존재하는지 확인
-        User user = findUserById(userDto.getId());
-
-        // post 작성자와 현재 login 사용자 id 일치 여부 확인
-        if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
-            throw new AuthorNotMatchException();
-        }
+        // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+        Post post = PostUserAuthentication(userDto.getId(), postId);
 
         postRepository.delete(post);
     }
 
     // postId로 post 객체 찾는 메서드
     private Post findPostById(Integer postId) {
-        return postRepository.findById(postId).orElseThrow(PostNotExistException::new);
+        return postRepository.findById(postId).orElseThrow(()->new UnityException(ErrorCode.POST_NOT_EXIST));
     }
 
     // userId로 User 객체 찾는 메서드
     private User findUserById(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotExistException::new);
+        return userRepository.findById(userId).orElseThrow(() -> new UnityException(ErrorCode.USER_NOT_EXIST));
+    }
+
+    // 해당 post와 user 존재여부 확인 및 게시글 사용자 인증
+    private Post PostUserAuthentication(Integer userId, Integer postId){
+        // 해당 user 존재하는지 확인
+        User user = findUserById(userId);
+
+        // 해당 post가 존재하는지 확인
+        Post post = findPostById(postId);
+
+        // post 작성자와 현재 login 사용자 id 일치 여부 확인
+        if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
+            throw new UnityException(ErrorCode.USER_NOT_EXIST);
+        }
+
+        Map<User, Post> postUserMap = new HashMap<>();
+        postUserMap.put(user,post);
+
+        return post;
     }
 
 
