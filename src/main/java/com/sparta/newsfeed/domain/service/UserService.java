@@ -3,7 +3,8 @@ package com.sparta.newsfeed.domain.service;
 import com.sparta.newsfeed.config.JwtUtil;
 import com.sparta.newsfeed.config.PasswordEncoder;
 import com.sparta.newsfeed.config.PasswordUtil;
-import com.sparta.newsfeed.domain.dto.UserRequestDto;
+import com.sparta.newsfeed.domain.dto.UserLoginRequestDto;
+import com.sparta.newsfeed.domain.dto.UserSignUpRequestDto;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,46 +31,46 @@ public class UserService {
 
     /**
      * 회원가입 메서드
-     * @param userRequestDto 유저의 입력 정보
+     * @param userSignUnRequestDto 유저의 입력 정보
      */
     @Transactional
-    public void signUp(UserRequestDto userRequestDto) {
+    public void signUp(UserSignUpRequestDto userSignUnRequestDto) {
         // 비밀번호 조건 확인
-        if (!passwordUtil.isValidPassword(userRequestDto.getPassword())) {
+        if (!passwordUtil.isValidPassword(userSignUnRequestDto.getPassword())) {
             throw new RuntimeException("회원가입 오류 뭐가 문제?");
         }
 
         // 이메일 중복 확인
-        Optional<User> user = userRepository.findByEmail(userRequestDto.getEmail());
-        if (!user.isEmpty()) {
+        Optional<User> user = userRepository.findByEmail(userSignUnRequestDto.getEmail());
+        if (user.isPresent()) {
             throw new RuntimeException("회원가입 email 문제?");
         }
 
         // 비밀번호 암호화 후 저장
-        String bcryptPassword = passwordEncoder.encode(userRequestDto.getPassword());
-        User newUser = new User(userRequestDto.getEmail(), bcryptPassword, userRequestDto.getName());
+        String bcryptPassword = passwordEncoder.encode(userSignUnRequestDto.getPassword());
+        User newUser = new User(userSignUnRequestDto.getEmail(), bcryptPassword, userSignUnRequestDto.getName());
 
         userRepository.save(newUser);
     }
 
     /**
      * 로그인 후 토큰을 반환하는 메서드
-     * @param userRequestDto 유저 입력값
+     * @param userLoginRequestDto 유저 로그인 입력값
      * @return 해당 유저의 Jwt토큰
      */
     @Transactional(readOnly = true)
-    public String login(UserRequestDto userRequestDto, HttpServletResponse response) {
+    public String login(UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
         // 유저 검증
-        User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow();
 
         // 비밀번호 검증
-        if (!passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
             return null;
         }
 
-        String token = jwtUtil.createToken(user.getUserId());
+        String token = jwtUtil.createToken(user.getUserId(), "Access Token");
         jwtUtil.addJwtToCookie(response, token);
-        return jwtUtil.createToken(user.getUserId());
+        return token;
     }
 
     /**

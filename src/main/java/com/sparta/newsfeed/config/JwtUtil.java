@@ -47,7 +47,7 @@ public class JwtUtil {
      * @param userId 토큰에 담길 userId
      * @return userId가 포함된 토큰
      */
-    public String createToken(int userId) {
+    public String createToken(int userId, String tokenType) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -56,6 +56,7 @@ public class JwtUtil {
                         .setExpiration(new Date(date.getTime() + TOKEN_EXPIRES_IN_SECONDS))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
+                        .setSubject(tokenType)
                         .compact();
     }
 

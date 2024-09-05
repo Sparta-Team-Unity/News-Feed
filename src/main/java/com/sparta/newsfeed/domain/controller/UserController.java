@@ -2,8 +2,8 @@ package com.sparta.newsfeed.domain.controller;
 
 import com.sparta.newsfeed.config.AuthUser;
 import com.sparta.newsfeed.domain.dto.UserDto;
-import com.sparta.newsfeed.domain.dto.UserRequestDto;
-import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.dto.UserLoginRequestDto;
+import com.sparta.newsfeed.domain.dto.UserSignUpRequestDto;
 import com.sparta.newsfeed.domain.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,13 +19,13 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public void signUp(@RequestBody UserRequestDto userRequestDto) {
-        userService.signUp(userRequestDto);
+    public void signUp(@RequestBody UserSignUpRequestDto userSigninRequestDto) {
+        userService.signUp(userSigninRequestDto);
     }
 
     @PostMapping("/users/login")
-    public String logIn(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
-        return userService.login(userRequestDto, response);
+    public String logIn(@RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
+        return userService.login(userLoginRequestDto, response);
     }
 
     @DeleteMapping("/users/logout")

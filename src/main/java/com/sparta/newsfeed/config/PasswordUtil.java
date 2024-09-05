@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class PasswordUtil {
-    final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,10}$";
+    final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!#^()%*?&])[A-Za-z\\d@$!%*?&]{8,10}$";
 
     /**
      * 암호가 조건에 부합하는지 확인하는 메서드
