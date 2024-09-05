@@ -7,6 +7,8 @@ import com.sparta.newsfeed.domain.dto.PostUpdateRequestDto;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.entity.Post;
 import com.sparta.newsfeed.domain.entity.User;
+import com.sparta.newsfeed.domain.exception.PostNotExistException;
+import com.sparta.newsfeed.domain.exception.UserNotExistException;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
 import com.sparta.newsfeed.domain.repository.PostRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
@@ -87,10 +89,10 @@ public class PostService {
     @Transactional
     public void updatePost(Integer postId, PostUpdateRequestDto postUpdateRequestDto) {
         // 해당 post가 존재하는지 확인
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post not found"));
+        Post post = postRepository.findById(postId).orElseThrow(PostNotExistException::new);
 
         // 해당 user 존재하는지 확인
-        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(() -> new NoSuchElementException("User not found"));
+        User user = userRepository.findById(postUpdateRequestDto.getUserId()).orElseThrow(UserNotExistException::new);
 
         if (post.getUser() == null || !user.getUserId().equals(post.getUser().getUserId())) {
             throw new NoSuchElementException("작성자가 일치하지 않습니다.");
@@ -106,7 +108,7 @@ public class PostService {
     @Transactional
     public void deletePost(Integer postId) {
         // 해당 post가 존재하는지 확인
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post not found"));
+        Post post = postRepository.findById(postId).orElseThrow(PostNotExistException::new);
 
         // 작성자와 현재 계정이 일치한지 확인 필요
 
