@@ -1,6 +1,6 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.config.JwtUtil;
+import com.sparta.newsfeed.config.filter.JwtUtil;
 import com.sparta.newsfeed.domain.entity.Token;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.exception.ErrorCode;

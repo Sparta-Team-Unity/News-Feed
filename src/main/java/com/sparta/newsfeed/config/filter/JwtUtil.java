@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.filter;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

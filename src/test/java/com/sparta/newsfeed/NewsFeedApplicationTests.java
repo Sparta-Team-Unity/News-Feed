@@ -1,6 +1,6 @@
 package com.sparta.newsfeed;
 
-import com.sparta.newsfeed.config.PasswordUtil;
+import com.sparta.newsfeed.config.passwordconfig.PasswordUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

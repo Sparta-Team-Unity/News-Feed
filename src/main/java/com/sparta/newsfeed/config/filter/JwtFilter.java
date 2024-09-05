@@ -1,23 +1,18 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.filter;
 
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.exception.ErrorCode;
 import com.sparta.newsfeed.domain.exception.UnityException;
-import com.sparta.newsfeed.domain.repository.TokenRepository;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import com.sparta.newsfeed.domain.service.BlacklistTokenService;
 import com.sparta.newsfeed.domain.service.TokenService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -63,11 +58,10 @@ public class JwtFilter implements Filter {
 
     /**
      * 토큰 필터 메인 로직
-     * @param servletRequest
-     * @param servletResponse
-     * @param filterChain
+     * @param servletRequest User정보를 탑제할 요청이 들어온 정보
+     * @param servletResponse 토큰 갱신이 필요하다면 갱신할 반환 정보
      */
-    private void tokenFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    private void tokenFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
         String tokenValue = jwtUtil.getTokenFromRequest((HttpServletRequest) servletRequest);
 
         if (isBlacklistToken(tokenValue)) {
@@ -84,22 +78,25 @@ public class JwtFilter implements Filter {
                 throw new UnityException(ErrorCode.EXPIRED_TOKEN);
             }
 
+            // 토큰에 실린 id를 통해 유저 조회
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new NullPointerException("Not Found User")
             );
 
+            // access 토큰을 갱신한다.
             refreshAccessToken((HttpServletResponse) servletResponse, user);
-            try {
-                servletRequest.setAttribute("user", user);
-            }
-            catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            // request에 유저 정보 탑제
+            servletRequest.setAttribute("user", user);
         } else {
             throw new IllegalArgumentException("Token Not Found");
         }
     }
 
+    /**
+     * 이미 blacklist에 등록된 토큰인지 확인하는 메서드
+     * @param token 확인할 토큰
+     * @return true : BlackList에 이미 등록된 상태 / false : 아직 등록이 안된 상태
+     */
     private boolean isBlacklistToken(String token) {
         return blacklistTokenService.isBlacklisted(token);
     }

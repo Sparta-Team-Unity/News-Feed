@@ -1,6 +1,10 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.domain.dto.*;
+import com.sparta.newsfeed.domain.dto.friend.FollowDto;
+import com.sparta.newsfeed.domain.dto.friend.FriendResponseDto;
+import com.sparta.newsfeed.domain.dto.friend.WaitsDto;
+import com.sparta.newsfeed.domain.dto.friend.WaitsResponseDto;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.entity.Friend;
 import com.sparta.newsfeed.domain.exception.*;
 import com.sparta.newsfeed.domain.repository.FriendRepository;
@@ -22,7 +26,11 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
 
-    //친구 신청 메서드
+    /**
+     * 친구 추가하는 메서드
+     * @param followId 추가할 친구 Id
+     * @param userDto 현재 로그인 중인 유저 정보
+     */
     public void addFriend(Integer followId, UserDto userDto) {
         User toUser = targetUser(followId);
         User currentUser = currentUser(userDto);

@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.filter;
 
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import com.sparta.newsfeed.domain.service.BlacklistTokenService;
@@ -57,8 +57,21 @@ public class FilterConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        // 우선 모든 URL에 대한 접근이 가능하게 생성
-                        .requestMatchers("/api/**").permitAll()
+                        // 유저 관련 승인
+                        .requestMatchers("/api/users").permitAll()
+                        .requestMatchers("/api/users/login").permitAll()
+                        .requestMatchers("/api/users/logout").permitAll()
+                        // 친구 요청 관련
+                        .requestMatchers("/api/follows").permitAll()
+                        .requestMatchers("/api/follows/").permitAll()
+                        .requestMatchers("/api/follows/waits").permitAll()
+                        // 포스트 관련
+                        .requestMatchers("/api/posts").permitAll()
+                        .requestMatchers("/api/posts/").permitAll()
+                        // 프로필 관련
+                        .requestMatchers("/api/profiles").permitAll()
+                        .requestMatchers("/api/profiles/").permitAll()
+                        // 에러 관련
                         .requestMatchers("/error").permitAll()
                         // 그 외에는 인증이 되어야 한다.
                         .anyRequest().authenticated()

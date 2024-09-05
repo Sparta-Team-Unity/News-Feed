@@ -1,18 +1,16 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.config.PasswordEncoder;
-import com.sparta.newsfeed.config.PasswordUtil;
-import com.sparta.newsfeed.domain.dto.ProfileSaveRequestDto;
-import com.sparta.newsfeed.domain.dto.ProfileViewResponseDto;
-import com.sparta.newsfeed.domain.dto.UserDto;
+import com.sparta.newsfeed.config.passwordconfig.PasswordEncoder;
+import com.sparta.newsfeed.config.passwordconfig.PasswordUtil;
+import com.sparta.newsfeed.domain.dto.profile.ProfileSaveRequestDto;
+import com.sparta.newsfeed.domain.dto.profile.ProfileViewResponseDto;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.entity.User;
 import com.sparta.newsfeed.domain.exception.*;
 import com.sparta.newsfeed.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.authconfig;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

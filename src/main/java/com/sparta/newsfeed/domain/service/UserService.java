@@ -1,18 +1,15 @@
 package com.sparta.newsfeed.domain.service;
 
-import com.sparta.newsfeed.config.JwtUtil;
-import com.sparta.newsfeed.config.PasswordEncoder;
-import com.sparta.newsfeed.config.PasswordUtil;
-import com.sparta.newsfeed.domain.dto.UserDto;
-import com.sparta.newsfeed.domain.dto.UserLoginRequestDto;
-import com.sparta.newsfeed.domain.dto.UserSignUpRequestDto;
-import com.sparta.newsfeed.domain.entity.BlacklistToken;
+import com.sparta.newsfeed.config.filter.JwtUtil;
+import com.sparta.newsfeed.config.passwordconfig.PasswordEncoder;
+import com.sparta.newsfeed.config.passwordconfig.PasswordUtil;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
+import com.sparta.newsfeed.domain.dto.user.UserLoginRequestDto;
+import com.sparta.newsfeed.domain.dto.user.UserSignUpRequestDto;
 import com.sparta.newsfeed.domain.entity.Token;
 import com.sparta.newsfeed.domain.entity.User;
-import com.sparta.newsfeed.domain.exception.ErrorCode;
 import com.sparta.newsfeed.domain.exception.UnityException;
 import com.sparta.newsfeed.domain.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,13 +99,19 @@ public class UserService {
      * @param userDto 유저 정보
      */
     @Transactional
-    public void logout(UserDto userDto) throws Exception {
-        User user = userRepository.findById(userDto.getId()).orElseThrow();
+    public void logout(UserDto userDto) {
+        User user = userRepository.findById(userDto.getId()).orElseThrow(
+                ()-> new UnityException(USER_NOT_EXIST)
+        );
 
         // 토큰을 Blacklist에 삽입
         blacklistTokenService.addBlacklistToken(user.getToken().getAccessToken());
     }
 
+    /**
+     * 로그아웃 하는 메서드
+     * @param userDto 현재 로그인 중인 유저 정보
+     */
     @Transactional
     public void signOut(UserDto userDto) {
         User user = userRepository.findById(userDto.getId()).orElseThrow();

@@ -1,6 +1,6 @@
-package com.sparta.newsfeed.config;
+package com.sparta.newsfeed.config.authconfig;
 
-import com.sparta.newsfeed.domain.dto.UserDto;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -23,12 +23,6 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     /**
      * Argument에 들어갈 데이터를 조립해주는 메서드
-     * @param parameter
-     * @param mavContainer
-     * @param webRequest
-     * @param binderFactory
-     * @return
-     * @throws Exception
      */
     @Override
     public Object resolveArgument(

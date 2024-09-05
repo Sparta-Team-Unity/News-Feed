@@ -1,16 +1,17 @@
 package com.sparta.newsfeed.domain.controller;
 
-import com.sparta.newsfeed.config.AuthUser;
-import com.sparta.newsfeed.domain.dto.*;
+import com.sparta.newsfeed.config.authconfig.AuthUser;
+import com.sparta.newsfeed.domain.dto.post.PostRequestDto;
+import com.sparta.newsfeed.domain.dto.post.PostResponseDto;
+import com.sparta.newsfeed.domain.dto.post.PostUpdateRequestDto;
+import com.sparta.newsfeed.domain.dto.post.PostUpdateResponseDto;
+import com.sparta.newsfeed.domain.dto.user.UserDto;
 import com.sparta.newsfeed.domain.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 
 
 @RestController
@@ -22,8 +23,8 @@ public class PostController {
 
     /**
      * 게시물 작성
-     * @param postRequestDto
-     * @return
+     * @param postRequestDto 게시글 정보가 담긴 객체
+     * @return 게시글 작성 상태
      */
     @PostMapping("/posts")
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUser UserDto userDto){
@@ -33,10 +34,10 @@ public class PostController {
 
     /**
      * 본인, 친구 게시물 전체 조회
-     * @param page
-     * @param size
-     * @param userDto
-     * @return
+     * @param page 조회할 페이지
+     * @param size 페이지 크기
+     * @param userDto 현재 로그인 중인 유저 정보
+     * @return 본인, 친구 전체 게시물 중 해당 페이지 내용
      */
     @GetMapping("/posts")
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(
@@ -49,10 +50,10 @@ public class PostController {
 
     /**
      * 게시글 수정
-     * @param postId
-     * @param postUpdateRequestDto
-     * @param userDto
-     * @return
+     * @param postId 게시글 Id
+     * @param postUpdateRequestDto 수정할 게시글 내용
+     * @param userDto 로그인 중인 유저 정보
+     * @return 수정된 게시글 내용
      */
     @PutMapping("/posts/{postId}")
     public ResponseEntity<PostUpdateResponseDto> updatePost(
@@ -65,9 +66,9 @@ public class PostController {
 
     /**
      * 게시글 삭제
-     * @param postId
-     * @param userDto
-     * @return
+     * @param postId 게시글 Id
+     * @param userDto 로그인 중인 유저 정보
+     * @return 삭제 상태
      */
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(
