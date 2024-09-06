@@ -25,23 +25,21 @@
 
 2\. 와이어 프레임
 
-[##_Image|kage@ciAUp8/btsJsfUfti0/dNnZNE9K8lOZWPJBw0QO41/img.png|CDM|1.3|{"originWidth":1802,"originHeight":940,"style":"alignCenter"}_##]
-
-[https://www.figma.com/design/C42p7CihaVfZ9x7b6AAhlV/NewsFeed?node-id=0-1&m=dev&t=cUKtXs49JVs0NvTA-1](https://www.figma.com/design/C42p7CihaVfZ9x7b6AAhlV/NewsFeed?node-id=0-1&m=dev&t=cUKtXs49JVs0NvTA-1)
+![image](https://github.com/user-attachments/assets/7a292f39-66cc-4499-b0a7-39aea8e4f663)
 
 3\. API 명세서
 
-[##_Image|kage@qXEbw/btsJs0hKVqQ/svPGODQKWPJ1n8AZgllMXK/img.png|CDM|1.3|{"originWidth":1348,"originHeight":1248,"style":"alignCenter"}_##]
+![image](https://github.com/user-attachments/assets/33b7acff-b8a2-4fa2-ab77-8a375e3bbdfd)
 
 4\. ERD 설계도
 
-[##_Image|kage@UhuPC/btsJtJ7qrWY/BlZXMDVOXN5x226eWrXK11/img.png|CDM|1.3|{"originWidth":1718,"originHeight":816,"style":"alignCenter"}_##]
-
-[https://lucid.app/lucidchart/3ba54db2-3552-4f00-a352-2a95aaa4c9c9/edit?viewport\_loc=-221%2C-263%2C1934%2C1076%2C0\_0&invitationId=inv\_23c00b73-1b13-4876-97a9-40ddb928b0cf](https://lucid.app/lucidchart/3ba54db2-3552-4f00-a352-2a95aaa4c9c9/edit?viewport_loc=-221%2C-263%2C1934%2C1076%2C0_0&invitationId=inv_23c00b73-1b13-4876-97a9-40ddb928b0cf)
+![image](https://github.com/user-attachments/assets/93655ee2-86b9-4d3e-8c94-8799033b257e)
+viewport_loc=-221%2C-263%2C1934%2C1076%2C0_0&invitationId=inv_23c00b73-1b13-4876-97a9-40ddb928b0cf)
 
 5\. 클래스 다이어그램
 
-[##_Image|kage@o9nN4/btsJt3kja5G/9Okz8AlfyZKyseTeDViC0k/img.png|CDM|1.3|{"originWidth":2559,"originHeight":515,"style":"alignCenter"}_##]
+![image](https://github.com/user-attachments/assets/6fe28a79-8e10-4a14-b4b1-ec8c0ba36a07)
+
 
 6.PosdtMan Document 
 
