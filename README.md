@@ -17,7 +17,7 @@
 <br/><br/><br/>
 # 팀 노션 바로가기
 ### [Team Unity 노션 바로가기](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
-[![notion-labs-inc-logo-vector](https://github.com/user-attachments/assets/632ba518-b172-4a40-89ba-7c28bbc9073c)](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
+[![notion-logo](https://github.com/user-attachments/assets/98a7301c-64a3-47ba-ba6c-c8daea4a89b1)](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
 
 
 <br/><br/><br/>
@@ -56,7 +56,6 @@
 ![image](https://github.com/user-attachments/assets/7a292f39-66cc-4499-b0a7-39aea8e4f663)
 
 # 3. API 명세서
-
 ![image](https://github.com/user-attachments/assets/33b7acff-b8a2-4fa2-ab77-8a375e3bbdfd)
 
 # 4. ERD 설계도
@@ -116,7 +115,7 @@ CREATE TABLE blacklist_token(
 ![백엔드 로직 drawio (1)](https://github.com/user-attachments/assets/c61dd06d-4dfd-4901-9f54-2066eb3d77d9)
 
 
-# 6. PosdtMan Document 
+# 9. PosdtMan Document 
 
 ### [Team Unity News Feed API Document 보러가기](https://documenter.getpostman.com/view/37567058/2sAXjQ2VsS)
 
