@@ -32,7 +32,7 @@ public class JwtUtil {
     // 리프래쉬 토큰 유지 시간 1시간
     private final long REFRESH_TOKEN_EXPIRES_IN_SECONDS = 60 * 60 * 1000; // 60 * 60 * 1000;
     // 액세스 토큰 유지 시간 10분
-    private final long ACCESS_TOKEN_EXPIRES_IN_SECONDS = 60 * 1000;
+    private final long ACCESS_TOKEN_EXPIRES_IN_SECONDS = 60 * 1000 * 10;
 
     private final String CLAIM_USER_ID = "userId";
     private final String CLAIM_TOKEN_TYPE = "tokenType";
