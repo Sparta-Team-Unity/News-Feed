@@ -17,7 +17,7 @@
 <br/><br/><br/>
 # 팀 노션 바로가기
 ### [Team Unity 노션 바로가기](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
-[![notion-logo](https://github.com/user-attachments/assets/98a7301c-64a3-47ba-ba6c-c8daea4a89b1)](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
+[![notion-labs-inc-logo-vector](https://github.com/user-attachments/assets/20f54b5c-274a-4b81-ab80-502b5b60b23d)](https://www.notion.so/teamsparta/Team-Unity-16edc918022b4b3b9170f35a05466f8e)
 
 
 <br/><br/><br/>
