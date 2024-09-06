@@ -33,8 +33,8 @@
 
 4\. ERD 설계도
 
-![image](https://github.com/user-attachments/assets/93655ee2-86b9-4d3e-8c94-8799033b257e)
-viewport_loc=-221%2C-263%2C1934%2C1076%2C0_0&invitationId=inv_23c00b73-1b13-4876-97a9-40ddb928b0cf)
+![NewsFeed ERD - Page 1 (2)](https://github.com/user-attachments/assets/3e951f5c-fe00-4210-ad69-01fe8eccb3db)
+
 
 5\. 클래스 다이어그램
 
@@ -44,3 +44,4 @@ viewport_loc=-221%2C-263%2C1934%2C1076%2C0_0&invitationId=inv_23c00b73-1b13-4876
 6.PosdtMan Document 
 
 [https://documenter.getpostman.com/view/37567058/2sAXjQ2VsS](https://documenter.getpostman.com/view/37567058/2sAXjQ2VsS)
+![Postman_(software)](https://github.com/user-attachments/assets/1a88b641-ccac-4385-9b0a-4ad8f7ffbe91)
