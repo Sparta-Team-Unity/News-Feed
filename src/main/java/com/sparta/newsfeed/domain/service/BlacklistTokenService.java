@@ -1,17 +1,23 @@
 package com.sparta.newsfeed.domain.service;
 
+import com.sparta.newsfeed.config.filter.JwtUtil;
 import com.sparta.newsfeed.domain.entity.BlacklistToken;
 import com.sparta.newsfeed.domain.repository.BlacklistTokenRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class BlacklistTokenService {
 
     private final BlacklistTokenRepository blacklistTokenRepository;
+    private final JwtUtil jwtUtil;
 
-    public BlacklistTokenService(BlacklistTokenRepository blacklistTokenRepository) {
+    public BlacklistTokenService(BlacklistTokenRepository blacklistTokenRepository, JwtUtil jwtUtil) {
         this.blacklistTokenRepository = blacklistTokenRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -33,5 +39,21 @@ public class BlacklistTokenService {
         BlacklistToken blacklistToken  = new BlacklistToken(token);
 
         blacklistTokenRepository.save(blacklistToken);
+    }
+
+    /**
+     * BlackListToken에 기간이 만료된 토큰을 삭제하는 메서드
+     */
+    @Transactional
+    public void clearExpirestoken() {
+        List<BlacklistToken> blacklistTokens = blacklistTokenRepository.findAll();
+
+        for (BlacklistToken blacklistToken : blacklistTokens) {
+            String token = jwtUtil.substringToken(blacklistToken.getBlacklistToken());
+
+            if(!jwtUtil.validateToken(token)) {
+                blacklistTokenRepository.delete(blacklistToken);
+            }
+        }
     }
 }

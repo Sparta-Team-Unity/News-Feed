@@ -132,6 +132,7 @@ public class JwtFilter implements Filter {
         int userId = 0;
 
         try {
+            // 현재 토큰으로 부터 userId 추출
             userId = jwtUtil.getUserIdFromToken(token);
         } catch(ExpiredJwtException e) {
             // 토큰이 만료된 경우, refresh 토큰으로 체크
@@ -145,7 +146,6 @@ public class JwtFilter implements Filter {
                 throw new UnityException(ErrorCode.EXPIRED_TOKEN);
             }
         }
-
         return userId;
     }
 }
