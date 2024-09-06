@@ -17,7 +17,6 @@ public class BlackListTokenScheduler {
      */
     @Scheduled(cron = "0 0 0/1 * * *")
     public void blackListTokens() {
-        System.out.println("돌아가고 있다");
         blacklistTokenService.clearExpirestoken();
     }
 }
